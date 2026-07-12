@@ -9,7 +9,8 @@ import { ConfirmDeleteDialogProvider } from "@/features/delete-entity/confirm-de
 import ConfirmDeleteDialog from "@/features/delete-entity/confirm-delete-dialog";
 import { Toaster } from "@/shared/ui/sonner";
 import AppPanel from "@/widgets/app-panel";
-import EditorArea from "./editor-area";
+import EditorArea from "@/widgets/editor-area";
+
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
