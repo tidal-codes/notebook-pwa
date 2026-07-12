@@ -1,7 +1,7 @@
 import { useNotes } from "@/entities/note/api/note.queries";
 import ExplorerTree from "./explorer-tree";
 import { useFolders } from "@/entities/folder/api/folder.queries";
-import { useTreeGenerator } from "../model/useTreeGenerator";
+import { useTreeGenerator } from "../model/use-tree-generator";
 import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
 import {
   selectLastAddedItemId,
@@ -19,6 +19,7 @@ import { OrderedIdsProvider } from "../model/ordered-ids-context";
 import ExplorerSelectionActionBar from "./explorer-selection-action-bar";
 import { clearSelection } from "../model/explorer.slice";
 import ExplorerTreeLoading from "./explorer-tree-loading";
+import { useSortedEntities } from "../model/use-sorted-entities";
 
 export default function PanelExplorer() {
   const { isLoading: notes_loading, data: notes } = useNotes();
@@ -26,10 +27,12 @@ export default function PanelExplorer() {
 
   const loading = notes_loading || folders_loading;
 
-  const { tree, orderedIds } = useTreeGenerator({
+  const entities = useSortedEntities({
     folders: folders || [],
     notes: notes || [],
   });
+
+  const { tree, orderedIds } = useTreeGenerator({ entities });
 
   const dispatch = useAppDispatch();
 

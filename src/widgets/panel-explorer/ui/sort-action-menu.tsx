@@ -41,13 +41,6 @@ export default function SortActionMenu({ sortBy, onSortByChange }: Props) {
         { id: "CREATED_DESC", label: "created time (old to new)" },
       ],
     },
-    { type: "separator" },
-    {
-      type: "radio-group",
-      groupId: "sort",
-      value: sortBy,
-      items: [{ id: "CUSTOM", label: "custom" }],
-    },
   ];
 
   return (
