@@ -1,17 +1,15 @@
 import React from "react";
 import { cn } from "@/shared/lib/utils";
 import { Button, buttonVariants } from "@/shared/ui/button";
-import { CheckCircle2, ChevronRight, Ellipsis, XCircle } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ChevronRight, Ellipsis } from "lucide-react";
 import { Checkbox } from "@/shared/ui/checkbox";
-import { Input } from "@/shared/ui/input";
 import EntityItemContextMenu from "./entity-item-context-menu";
 import EntityItemDropdownMenu from "./entity-item-dropdown-menu";
-import type { MenuEntry } from "@/shared/model/types";
+import type { MenuEntry, TreeEntity } from "@/shared/model/types";
 import { getItemPaddingLeft } from "../lib/treeIndent";
-import { InputGroup, InputGroupAddon } from "@/shared/ui/input-group";
+import EntityItemRenameInput from "./entity-item-rename-input";
 
-/** استیت و اکشن‌های سلکشن (چک‌باکس / حالت انتخاب چندتایی) */
+
 export interface EntityItemSelectionProps {
   isSelected?: boolean;
   isSelectMode?: boolean;
@@ -20,27 +18,19 @@ export interface EntityItemSelectionProps {
   onCheckToggle?: () => void;
 }
 
-/** استیت و اکشن‌های رنیم — کاملاً کنترل‌شده، مقدار و تغییرش دست والده */
 export interface EntityItemRenameProps {
   isRenaming?: boolean;
-  value?: string;
-  onChange?: (value: string) => void;
-  onCommit?: () => void;
+  onCommit?: (value: string) => void;
   onCancel?: () => void;
 }
 
-/** آیتم‌های منو + استیت بازبودن منوها — کنترل‌شده */
 export interface EntityItemMenuProps<T extends string> {
   items: MenuEntry<T>[];
   isContextMenuOpen?: boolean;
   isDropdownMenuOpen?: boolean;
   onContextMenuOpenChange?: (open: boolean) => void;
   onDropdownMenuOpenChange?: (open: boolean) => void;
-  onAction: (
-    actionId: T,
-    entityId: string,
-    entityType: "folder" | "note",
-  ) => void;
+  onAction: (actionId: T, entityId: string, entityType: TreeEntity) => void;
 }
 
 export interface EntityItemProps<T extends string> {
@@ -84,8 +74,6 @@ export default function EntityItem<T extends string>({
 
   const {
     isRenaming = false,
-    value: renameValue,
-    onChange: onRenameChange,
     onCommit: onRenameCommit,
     onCancel: onRenameCancel,
   } = rename;
@@ -99,30 +87,8 @@ export default function EntityItem<T extends string>({
     onAction: onMenuClick,
   } = menu;
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const isAnyMenuOpen = isContextMenuOpen || isDropdownMenuOpen;
   const entityLabel = isFolder ? "folder" : "note";
-
-  useEffect(() => {
-    if (isRenaming) {
-      const el = inputRef.current;
-      if (el) {
-        el.focus();
-        el.select();
-      }
-    }
-  }, [isRenaming]);
-
-  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      inputRef.current?.blur();
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      onRenameCancel?.();
-      inputRef.current?.blur();
-    }
-  }
 
   function handleItemClick(e: React.MouseEvent<HTMLButtonElement>) {
     if (!isSelectMode) {
@@ -218,42 +184,11 @@ export default function EntityItem<T extends string>({
             )}
 
             {isRenaming ? (
-              // نکته‌ی کلیدی: flex-1 min-w-0 روی خودِ InputGroup،
-              // نه فقط روی Input داخلش — وگرنه InputGroup به‌جای shrink،
-              // به اندازه‌ی محتوای طبیعیش (اینپوت + دکمه‌ها) عرض می‌گیره و overflow می‌ده
-              <InputGroup className="min-w-0 flex-1 border-0 bg-transparent outline-0 focus-visible:ring-0 focus-visible:ring-offset-0">
-                <Input
-                  ref={inputRef}
-                  value={renameValue ?? title}
-                  onChange={(e) => onRenameChange?.(e.target.value)}
-                  onBlur={() => onRenameCommit?.()}
-                  onKeyDown={handleInputKeyDown}
-                  onClick={(e) => e.stopPropagation()}
-                  className="h-6 min-w-0 flex-1 border-none bg-transparent px-1 text-sm outline-0 focus-visible:ring-0 dark:bg-transparent"
-                />
-                <InputGroupAddon align="inline-end">
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRenameCancel?.();
-                    }}
-                  >
-                    <XCircle className="text-destructive" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRenameCommit?.();
-                    }}
-                  >
-                    <CheckCircle2 className="text-success" />
-                  </Button>
-                </InputGroupAddon>
-              </InputGroup>
+              <EntityItemRenameInput
+                title={title}
+                onCommit={(value) => onRenameCommit?.(value)}
+                onCancel={onRenameCancel}
+              />
             ) : (
               <span
                 className="min-w-0 flex-1 truncate text-start text-sm"

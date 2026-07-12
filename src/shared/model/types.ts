@@ -95,3 +95,5 @@ export interface MenuCallbacks<TId extends string = string> {
   onRadioChange?: (groupId: string, value: TId) => void;
 }
 // ----------------------
+
+export type TreeEntity = "folder" | "note";

@@ -25,7 +25,13 @@ export default function TreeFolderItem({ id, depth, children }: Props) {
   });
 
   const { onFolderToggle, menu, onTreeItemClick, rename, selection } =
-    useTreeItem(FOLDER_MENU_ITEMS, "folder", id, folder?.name || "");
+    useTreeItem({
+      menuItems: FOLDER_MENU_ITEMS,
+      type: "folder",
+      id,
+      parent_id: folder?.parent_id ?? null,
+      title: folder?.name || "",
+    });
   const isCollapsed = useAppSelector(selectIsFolderCollapsed(id));
   if (!folder) return null;
 

@@ -1,0 +1,1 @@
+export const FOLDERS_KEY = ["folders"];

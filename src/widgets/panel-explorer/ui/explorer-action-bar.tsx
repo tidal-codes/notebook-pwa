@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import SortActionMenu from "./sort-action-menu";
 import { itemAdded, startRenaming } from "../model/explorer.slice";
-import type { PanelItemType } from "@/entities/explorer/model/types";
+import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
 
 interface Props {
   isLoading: boolean;
@@ -42,7 +42,7 @@ export default function ExplorerActionBar({
 
   function handleToggleFoldersCollapse() {
     const folderIds = (
-      queryClient.getQueryData<FolderEntity[]>(["folders"]) || []
+      queryClient.getQueryData<FolderEntity[]>(FOLDERS_KEY) || []
     ).map((folder) => folder.id);
     dispatch(toggleAllFolders(folderIds));
   }
@@ -51,7 +51,7 @@ export default function ExplorerActionBar({
     dispatch(setNotesSort(sort));
   }
 
-  function onEntityCreated(type: PanelItemType, id: string) {
+  function onEntityCreated(type: "note" | "folder", id: string) {
     dispatch(itemAdded(id));
     type === "folder" && dispatch(startRenaming(id));
   }

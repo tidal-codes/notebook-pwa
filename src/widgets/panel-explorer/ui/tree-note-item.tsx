@@ -14,12 +14,13 @@ export default function TreeNoteItem({ id, depth }: Props) {
     ...notesQueryOptions,
     select: (notes) => notes.find((note) => note.id === id),
   });
-  const { menu, onTreeItemClick, rename, selection } = useTreeItem(
-    NOTE_MENU_ITEMS,
-    "note",
+  const { menu, onTreeItemClick, rename, selection } = useTreeItem({
     id,
-    note?.name || "",
-  );
+    menuItems: NOTE_MENU_ITEMS,
+    parent_id: note?.parent_id ?? null,
+    title: note?.name ?? "",
+    type: "note",
+  });
 
   if (!note) return null;
 

@@ -1,7 +1,8 @@
 import { useDeleteNote } from "@/entities/note/api/note.mutations";
+import type { TreeEntity } from "@/shared/model/types";
 import { toast } from "sonner";
 
-export default function useDeleteEntity(id: string, type: "folder" | "note") {
+export default function useDeleteEntity(id: string, type: TreeEntity) {
   const { mutateAsync : deleteNote , isPending } = useDeleteNote();
 
   async function deleteEntity() {
