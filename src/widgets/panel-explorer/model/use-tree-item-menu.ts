@@ -10,6 +10,7 @@ import type { MenuEntry, TreeEntity } from "@/shared/model/types";
 import type { EntityItemMenuProps } from "../ui/tree-item";
 import useAddNewEntity from "@/features/add-new-entity/model/use-add-new-entity";
 import useCloneEntity from "@/features/clone-entity/use-clone-entity";
+import { useMoveEntityDialogActions } from "@/features/move-entity/move-entity-dialog-provider";
 
 export function useTreeItemMenu<T extends string>(
   menuItems: MenuEntry<T>[],
@@ -19,6 +20,7 @@ export function useTreeItemMenu<T extends string>(
 ): EntityItemMenuProps<T> {
   const dispatch = useAppDispatch();
   const { showDialog } = useConfirmDeleteDialogActions();
+  const { showDialog: showMoveEntityDialog } = useMoveEntityDialogActions();
   const { createItem } = useAddNewEntity();
   const { cloneEntity } = useCloneEntity();
 
@@ -70,8 +72,11 @@ export function useTreeItemMenu<T extends string>(
           break;
 
         case "MOVE_TO":
-          // TODO
-          // openMoveDialog(id)
+          showMoveEntityDialog({
+            defaultValues: {
+              entities: [{ id, type }],
+            },
+          });
           break;
 
         case "BOOKMARK":

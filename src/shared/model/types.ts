@@ -8,6 +8,13 @@ export interface BaseEntity {
   is_dirty: boolean;
 }
 
+export interface SelectedEntity {
+  id: string;
+  type: TreeEntity;
+}
+
+
+
 // ------- MENU ---------
 import type { ReactNode } from "react";
 

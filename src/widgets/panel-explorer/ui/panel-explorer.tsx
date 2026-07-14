@@ -37,6 +37,7 @@ export default function PanelExplorer() {
   const dispatch = useAppDispatch();
 
   const selectedCount = useAppSelector(selectSelectedCount);
+  
   const semiSelectedItem = useAppSelector(selectSemiSelectedItem);
   const lastAddedItemId = useAppSelector(selectLastAddedItemId);
 

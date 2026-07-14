@@ -21,6 +21,7 @@ import {
 } from "../model/explorer.selectors";
 import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
 import { semiSelectedItemCleared } from "../model/explorer.slice";
+import { useMoveEntityDialogActions } from "@/features/move-entity/move-entity-dialog-provider";
 
 interface Props {
   selectedCount: number;
@@ -39,7 +40,10 @@ export default function ExplorerSelectionActionBar({
   const { showDialog } = useConfirmDeleteDialogActions();
   const selectedItems = useAppSelector(selectSelectedEntitiesList);
   const semiSelectedItem = useAppSelector(selectSemiSelectedItem);
+
   const dispatch = useAppDispatch();
+
+  const { showDialog: showMoveEntitiesDialog } = useMoveEntityDialogActions();
 
   const selectedActionsMenuItems = useMemo(
     (): MenuEntry<SelectionActionIds>[] => [
@@ -83,6 +87,16 @@ export default function ExplorerSelectionActionBar({
           if (selectedItems.find((v) => v.id === semiSelectedItem?.id)) {
             dispatch(semiSelectedItemCleared());
           }
+        },
+      });
+    },
+    MOVE_ITEMS: () => {
+      showMoveEntitiesDialog({
+        defaultValues: {
+          entities: selectedItems,
+        },
+        onSubmit: () => {
+          clearSelection();
         },
       });
     },

@@ -2,9 +2,15 @@ import { db } from "@/app/indexed-db/db";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { resolveDeletionSet, type SelectedEntity, type TreeEntityRef } from "./resolve-deletion-set";
+import {
+  resolveDeletionSet,
+  type TreeEntityRef,
+} from "./resolve-deletion-set";
 import type { FolderEntity } from "@/entities/folder/model/types";
 import type { NoteEntity } from "@/entities/note/model/types";
+import { updateFolder } from "@/entities/folder/api";
+import { updateNote } from "@/entities/note/api";
+import type { SelectedEntity } from "@/shared/model/types";
 
 export default function useDeleteEntities() {
   const queryClient = useQueryClient();
@@ -14,7 +20,8 @@ export default function useDeleteEntities() {
     mutationFn: async (selectedItems: SelectedEntity[]) => {
       // اینجا چون داخل mutationFn هستیم و نه useEffect، خوندن مستقیم از کش
       // مشکلی نداره — دیتا در لحظه‌ی اجرای mutation (نه در closure رندر) خونده می‌شه
-      const folders = queryClient.getQueryData<FolderEntity[]>(["folders"]) ?? [];
+      const folders =
+        queryClient.getQueryData<FolderEntity[]>(["folders"]) ?? [];
       const notes = queryClient.getQueryData<NoteEntity[]>(["notes"]) ?? [];
 
       const allEntities: TreeEntityRef[] = [
@@ -39,14 +46,14 @@ export default function useDeleteEntities() {
       await db.transaction("rw", db.notes, db.folders, async () => {
         await Promise.all([
           ...folderIds.map((id) =>
-            db.folders.update(id, {
+            updateFolder(id, {
               is_deleted: true,
               updated_at: updatedAt,
               is_dirty: true,
             }),
           ),
           ...noteIds.map((id) =>
-            db.notes.update(id, {
+            updateNote(id, {
               is_deleted: true,
               updated_at: updatedAt,
               is_dirty: true,
