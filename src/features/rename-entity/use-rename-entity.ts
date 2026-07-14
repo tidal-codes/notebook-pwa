@@ -7,7 +7,7 @@ import { useUpdateNote } from "@/entities/note/api/note.mutations";
 import { NOTES_KEY } from "@/entities/note/api/query.keys";
 import type { NoteEntity } from "@/entities/note/model/types";
 import type { TreeEntity } from "@/shared/model/types";
-import { isTitleUnique } from "../add-new-entity/lib/get-next-untitled-name";
+import { isTitleUnique } from "@/shared/lib/get-entity-name";
 
 interface RenameEntityParams {
   newName: string;

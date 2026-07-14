@@ -2,14 +2,10 @@ import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateFolder } from "@/entities/folder/api/folder.mutations";
 import { useCreateNote } from "@/entities/note/api/note.mutations";
-import type { NoteEntity } from "@/entities/note/model/types";
-import type { FolderEntity } from "@/entities/folder/model/types";
 import type { TreeEntity } from "@/shared/model/types";
-import { NOTES_KEY } from "@/entities/note/api/query.keys";
-import { getNextUntitledName } from "../lib/get-next-untitled-name";
-import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
 import useGetNotesData from "@/entities/note/model/use-get-notes-data";
 import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
+import { getNextUntitledName } from "@/shared/lib/get-entity-name";
 
 type OnEntityCreated = (type: TreeEntity, id: string) => void;
 

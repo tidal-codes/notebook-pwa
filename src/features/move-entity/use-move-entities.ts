@@ -6,14 +6,12 @@ import { updateFolder } from "@/entities/folder/api";
 import { updateNote } from "@/entities/note/api";
 import { toast } from "sonner";
 import type { SelectedEntity } from "@/shared/model/types";
-import type { FolderEntity } from "@/entities/folder/model/types";
-import type { NoteEntity } from "@/entities/note/model/types";
 import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
 import { NOTES_KEY } from "@/entities/note/api/query.keys";
 import { validateMoveTarget } from "./validate-move-target";
-import { getNextUntitledName } from "../add-new-entity/lib/get-next-untitled-name";
 import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
 import useGetNotesData from "@/entities/note/model/use-get-notes-data";
+import { getNextIndexedName } from "@/shared/lib/get-entity-name";
 
 class InvalidMoveError extends Error {
   public reason: "target-is-self" | "target-is-descendant";
@@ -81,7 +79,11 @@ export default function useMoveEntities() {
           ...entitiesToMove
             .filter((entity) => entity.type === "folder")
             .map((entity) => {
-              const name = getNextUntitledName([...usedFolderTitles]);
+              //TODO - HOW TO ADD FOLDER NAME
+              const name = getNextIndexedName(
+                [...usedFolderTitles],
+                allFolders.find((folder) => folder.id === entity.id)?.name,
+              );
               usedFolderTitles.add(name);
 
               return updateFolder(entity.id, {
@@ -95,7 +97,10 @@ export default function useMoveEntities() {
           ...entitiesToMove
             .filter((entity) => entity.type === "note")
             .map((entity) => {
-              const name = getNextUntitledName([...usedNoteTitles]);
+              const name = getNextIndexedName(
+                [...usedNoteTitles],
+                allNotes.find((note) => note.id === entity.id)?.name,
+              );
               usedNoteTitles.add(name);
 
               return updateNote(entity.id, {
