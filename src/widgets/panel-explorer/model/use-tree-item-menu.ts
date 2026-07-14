@@ -1,9 +1,15 @@
 import { useCallback, useMemo, useState } from "react";
 import { useAppDispatch } from "@/shared/config/store/hooks";
-import { enterSelectModeFromMenu, startRenaming } from "./explorer.slice";
+import {
+  enterSelectModeFromMenu,
+  itemAdded,
+  startRenaming,
+} from "./explorer.slice";
 import { useConfirmDeleteDialogActions } from "@/features/delete-entity/confirm-delete-dialog-provider";
-import type { MenuEntry } from "@/shared/model/types";
+import type { MenuEntry, TreeEntity } from "@/shared/model/types";
 import type { EntityItemMenuProps } from "../ui/tree-item";
+import useAddNewEntity from "@/features/add-new-entity/model/use-add-new-entity";
+import useCloneEntity from "@/features/clone-entity/use-clone-entity";
 
 export function useTreeItemMenu<T extends string>(
   menuItems: MenuEntry<T>[],
@@ -13,9 +19,16 @@ export function useTreeItemMenu<T extends string>(
 ): EntityItemMenuProps<T> {
   const dispatch = useAppDispatch();
   const { showDialog } = useConfirmDeleteDialogActions();
+  const { createItem } = useAddNewEntity();
+  const { cloneEntity } = useCloneEntity();
 
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
+
+  function onEntityCreated(type: TreeEntity, id: string) {
+    dispatch(itemAdded(id));
+    type === "folder" && dispatch(startRenaming(id));
+  }
 
   const onAction = useCallback(
     (actionId: T) => {
@@ -34,13 +47,15 @@ export function useTreeItemMenu<T extends string>(
         // ---------- Folder ----------
 
         case "NEW_NOTE":
-          // TODO
-          // dispatch(createNote({ parentId: id }))
+          if (type === "folder") {
+            createItem("note", id, onEntityCreated);
+          }
           break;
 
         case "NEW_FOLDER":
-          // TODO
-          // dispatch(createFolder({ parentId: id }))
+          if (type === "folder") {
+            createItem("folder", id, onEntityCreated);
+          }
           break;
 
         case "SEARCH_IN_FOLDER":
@@ -51,8 +66,7 @@ export function useTreeItemMenu<T extends string>(
         // ---------- Common ----------
 
         case "MAKE_COPY":
-          // TODO
-          // dispatch(duplicateEntity(id))
+          cloneEntity(type, id, () => null);
           break;
 
         case "MOVE_TO":
