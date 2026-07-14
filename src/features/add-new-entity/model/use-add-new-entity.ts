@@ -8,11 +8,15 @@ import type { TreeEntity } from "@/shared/model/types";
 import { NOTES_KEY } from "@/entities/note/api/query.keys";
 import { getNextUntitledName } from "../lib/get-next-untitled-name";
 import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
+import useGetNotesData from "@/entities/note/model/use-get-notes-data";
+import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
 
 type OnEntityCreated = (type: TreeEntity, id: string) => void;
 
 export default function useAddNewEntity() {
   const queryClient = useQueryClient();
+  const getNotesData = useGetNotesData();
+  const getFoldersData = useGetFoldersData();
   const { mutate: addNote } = useCreateNote();
   const { mutate: addFolder } = useCreateFolder();
 
@@ -22,8 +26,8 @@ export default function useAddNewEntity() {
       parentFolderId: string | null,
       onEntityCreated: OnEntityCreated,
     ) => {
-      const notes = queryClient.getQueryData<NoteEntity[]>(NOTES_KEY) ?? [];
-      const folders = queryClient.getQueryData<FolderEntity[]>(FOLDERS_KEY) ?? [];
+      const notes = getNotesData();
+      const folders = getFoldersData();
 
       const siblingNames = (type === "note" ? notes : folders)
         .filter((item) => item.parent_id === parentFolderId)

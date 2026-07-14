@@ -12,6 +12,8 @@ import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
 import { NOTES_KEY } from "@/entities/note/api/query.keys";
 import { validateMoveTarget } from "./validate-move-target";
 import { getNextUntitledName } from "../add-new-entity/lib/get-next-untitled-name";
+import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
+import useGetNotesData from "@/entities/note/model/use-get-notes-data";
 
 class InvalidMoveError extends Error {
   public reason: "target-is-self" | "target-is-descendant";
@@ -32,6 +34,8 @@ function getSiblingTitles<T extends { parent_id: string | null; name: string }>(
 }
 
 export default function useMoveEntities() {
+  const getFoldersData = useGetFoldersData();
+  const getNotesData = useGetNotesData();
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
@@ -40,10 +44,9 @@ export default function useMoveEntities() {
       entities,
       folder_id,
     }: MoveEntityDialogData & { folder_id: string | null }) => {
-      const allFolders =
-        queryClient.getQueryData<FolderEntity[]>(FOLDERS_KEY) ?? [];
+      const allFolders = getFoldersData();
 
-      const allNotes = queryClient.getQueryData<NoteEntity[]>(NOTES_KEY) ?? [];
+      const allNotes = getNotesData();
 
       const validation = validateMoveTarget(entities, folder_id, allFolders);
       if (!validation.isValid) {

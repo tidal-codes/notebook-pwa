@@ -10,26 +10,22 @@ import useDeleteEntity from "./use-delete-entity";
 export default function ConfirmDeleteDialog() {
   const { open } = useConfirmDeleteDialogOpen();
   const { hideDialog } = useConfirmDeleteDialogActions();
-  const { defaultValues } = useConfirmDeleteDialogData();
+  const { defaultValues, onSubmit } = useConfirmDeleteDialogData();
   const { deleteEntities, isPending } = useDeleteEntity();
 
   const handleDelete = async () => {
     await deleteEntities(defaultValues?.entities || []);
+    onSubmit?.();
     hideDialog();
   };
   return (
     <Dialog open={open} onOpenChange={(open) => !open && hideDialog()}>
       <DialogContent>
         <DialogHeader>
-          <h3 className="text-lg font-semibold">
-            delete 
-          </h3>
+          <h3 className="text-lg font-semibold">delete</h3>
         </DialogHeader>
         <div>
-          <p>
-            Are you sure you want to delete ? This
-            action cannot be undone.
-          </p>
+          <p>Are you sure you want to delete ? This action cannot be undone.</p>
           {/* {defaultValues?.entityType === "folder" && (
             <p className="text-sm text-destructive mt-2">
               Deleting a folder will also delete all its contents.

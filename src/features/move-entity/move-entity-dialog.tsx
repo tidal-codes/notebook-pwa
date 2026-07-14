@@ -10,10 +10,12 @@ import {
 import { useEffect, useState } from "react";
 import type { MoveEntityDialogItem } from "./type";
 import useMoveEntities from "./use-move-entities";
+import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
 
 export default function MoveEntityDialog() {
   const { open } = useMoveEntityDialogOpen();
   const { hideDialog } = useMoveEntityDialogActions();
+  const getFoldersData = useGetFoldersData();
   const { defaultValues, onSubmit } = useMoveEntityDialogData();
   const { moveEntities } = useMoveEntities();
   const queryClient = useQueryClient();
@@ -40,7 +42,7 @@ export default function MoveEntityDialog() {
         id: null,
         title: "/",
       },
-      ...(queryClient.getQueryData<FolderEntity[]>(FOLDERS_KEY) ?? [])
+      ...getFoldersData()
         .filter((folder) => !excludedIds.has(folder.id))
         .map((folder) => ({
           id: folder.id,

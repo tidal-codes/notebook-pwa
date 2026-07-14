@@ -8,12 +8,16 @@ import type { TreeEntity } from "@/shared/model/types";
 import { NOTES_KEY } from "@/entities/note/api/query.keys";
 import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
 import { getNextUntitledName } from "@/shared/lib/get-next-untitled-name";
+import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
+import useGetNotesData from "@/entities/note/model/use-get-notes-data";
 
 
 type OnEntityCreated = (type: TreeEntity, id: string) => void;
 
 export default function useCloneEntity() {
   const queryClient = useQueryClient();
+  const getFoldersData = useGetFoldersData();
+  const getNotesData = useGetNotesData();
   const { mutate: addNote } = useCreateNote();
   const { mutate: addFolder } = useCreateFolder();
 
@@ -116,8 +120,8 @@ export default function useCloneEntity() {
 
   const cloneEntity = useCallback(
     (type: TreeEntity, id: string, onEntityCreated: OnEntityCreated) => {
-      const notes = queryClient.getQueryData<NoteEntity[]>(NOTES_KEY) ?? [];
-      const folders = queryClient.getQueryData<FolderEntity[]>(FOLDERS_KEY) ?? [];
+      const notes = getNotesData();
+      const folders = getFoldersData();
 
       if (type === "note") {
         const note = notes.find((n) => n.id === id);
