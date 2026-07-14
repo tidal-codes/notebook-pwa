@@ -11,13 +11,10 @@ export default function ConfirmDeleteDialog() {
   const { open } = useConfirmDeleteDialogOpen();
   const { hideDialog } = useConfirmDeleteDialogActions();
   const { defaultValues } = useConfirmDeleteDialogData();
-  const { deleteEntity, isPending } = useDeleteEntity(
-    defaultValues?.entityId ?? "",
-    defaultValues?.entityType ?? "note",
-  );
+  const { deleteEntities, isPending } = useDeleteEntity();
 
   const handleDelete = async () => {
-    await deleteEntity();
+    await deleteEntities(defaultValues?.entities || []);
     hideDialog();
   };
   return (
@@ -25,19 +22,19 @@ export default function ConfirmDeleteDialog() {
       <DialogContent>
         <DialogHeader>
           <h3 className="text-lg font-semibold">
-            delete {defaultValues?.entityType}
+            delete 
           </h3>
         </DialogHeader>
         <div>
           <p>
-            Are you sure you want to delete {defaultValues?.entityName}? This
+            Are you sure you want to delete ? This
             action cannot be undone.
           </p>
-          {defaultValues?.entityType === "folder" && (
+          {/* {defaultValues?.entityType === "folder" && (
             <p className="text-sm text-destructive mt-2">
               Deleting a folder will also delete all its contents.
             </p>
-          )}
+          )} */}
         </div>
         <div>
           <Button

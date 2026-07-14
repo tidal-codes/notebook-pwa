@@ -15,11 +15,11 @@ import { buildEntityById } from "../lib/build-entity-by-id";
 import { getEntityParents } from "../lib/get-entity-parents";
 import { openAllFolders } from "../model/explorer-preferences.slice";
 import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
-import { OrderedIdsProvider } from "../model/ordered-ids-context";
 import ExplorerSelectionActionBar from "./explorer-selection-action-bar";
 import { clearSelection } from "../model/explorer.slice";
 import ExplorerTreeLoading from "./explorer-tree-loading";
 import { useSortedEntities } from "../model/use-sorted-entities";
+import { OrderedItemsProvider } from "../model/ordered-items-context";
 
 export default function PanelExplorer() {
   const { isLoading: notes_loading, data: notes } = useNotes();
@@ -32,7 +32,7 @@ export default function PanelExplorer() {
     notes: notes || [],
   });
 
-  const { tree, orderedIds } = useTreeGenerator({ entities });
+  const { tree, orderedItems } = useTreeGenerator({ entities });
 
   const dispatch = useAppDispatch();
 
@@ -56,7 +56,7 @@ export default function PanelExplorer() {
   }, [lastAddedItemId, folders, notes]);
 
   return (
-    <OrderedIdsProvider orderedIds={orderedIds}>
+    <OrderedItemsProvider orderedItems={orderedItems}>
       <div className="flex flex-col h-full">
         {selectedCount > 0 ? (
           <ExplorerSelectionActionBar
@@ -64,7 +64,6 @@ export default function PanelExplorer() {
             clearSelection={() => dispatch(clearSelection())}
           />
         ) : (
-          //null for now
           <ExplorerActionBar
             isLoading={loading}
             currentParentFolderId={getParent()}
@@ -80,6 +79,6 @@ export default function PanelExplorer() {
           </ScrollArea>
         )}
       </div>
-    </OrderedIdsProvider>
+    </OrderedItemsProvider>
   );
 }

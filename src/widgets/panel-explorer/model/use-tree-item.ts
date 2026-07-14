@@ -21,8 +21,8 @@ export default function useTreeItem<T extends string>({
   parent_id,
 }: UseTreeItemProps<T>) {
   const { onTreeItemClick, onFolderToggle } = useTreeItemClick(id, type);
-  const selection = useTreeItemSelection(id);
-  const rename = useTreeItemRename(id, type, title , parent_id);
+  const selection = useTreeItemSelection(id, type);
+  const rename = useTreeItemRename(id, type, title, parent_id);
   const menu = useTreeItemMenu(menuItems, id, type, title);
 
   return useMemo(

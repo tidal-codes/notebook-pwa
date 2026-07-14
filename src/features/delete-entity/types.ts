@@ -1,5 +1,6 @@
 export interface ConfirmDeleteDialogData {
-  entityId: string;
-  entityName: string;
-  entityType: "note" | "folder";
+  entities: Array<{
+    id: string;
+    type: "note" | "folder";
+  }>;
 }

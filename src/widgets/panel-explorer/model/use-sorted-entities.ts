@@ -1,5 +1,3 @@
-
-
 import type { FolderEntity } from "@/entities/folder/model/types";
 import type { NoteEntity } from "@/entities/note/model/types";
 import { useMemo } from "react";
@@ -7,7 +5,7 @@ import type { SortByType } from "./types";
 import { useAppSelector } from "@/shared/config/store/hooks";
 import { selectNotesSort } from "./explorer-preferences.selectors";
 
-type SortableEntity = FolderEntity | NoteEntity
+type SortableEntity = FolderEntity | NoteEntity;
 
 interface Params {
   folders: FolderEntity[];
@@ -45,7 +43,9 @@ export function useSortedEntities({
 }: Params): SortableEntity[] {
   const sortBy = useAppSelector(selectNotesSort);
   return useMemo(() => {
-    const merged: SortableEntity[] = [...folders, ...notes];
+    const merged: SortableEntity[] = [...folders, ...notes].filter(
+      (item) => !item.is_deleted,
+    );
 
     return merged.sort(getComparator(sortBy));
   }, [folders, notes, sortBy]);

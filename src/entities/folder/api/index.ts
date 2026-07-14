@@ -35,3 +35,22 @@ export async function getFolder(id: string) {
 export async function getFolders() {
   return db.folders.toArray();
 }
+
+export async function updateFolders(
+  ids: string[],
+  data: Partial<FolderEntity>
+) {
+  const updatedAt = Date.now();
+
+  await db.transaction("rw", db.folders, async () => {
+    await Promise.all(
+      ids.map((id) =>
+        db.folders.update(id, {
+          ...data,
+          updated_at: updatedAt,
+          is_dirty: true,
+        })
+      )
+    );
+  });
+}

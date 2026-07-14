@@ -1,5 +1,6 @@
 import type { FolderEntity } from "@/entities/folder/model/types";
 import type { NoteEntity } from "@/entities/note/model/types";
+import type { TreeEntity } from "@/shared/model/types";
 
 export type TreeNode =
   | {
@@ -18,16 +19,20 @@ export type TreeNode =
       children: TreeNode[];
     };
 
+export interface SelectedEntityMeta {
+  id: string;
+  type: TreeEntity;
+}
+
 export interface ExplorerType {
   lastAddedItemId: string | null;
-  semiSelecteditem: {
-    id: string;
-    type: "note" | "folder";
-  } | null;
+  semiSelecteditem: { id: string; type: TreeEntity } | null;
   isSelectMode: boolean;
-  selectedIds: string[];
+  // به‌جای selectedIds: string[]
+  selectedEntities: Record<string, SelectedEntityMeta>;
   renamingId: string | null;
 }
+
 
 export type CommonMenuItemIds =
   | "MAKE_COPY"

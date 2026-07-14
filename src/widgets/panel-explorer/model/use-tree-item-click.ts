@@ -3,12 +3,13 @@ import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
 import { itemClicked, shiftItemClicked } from "./explorer.slice";
 import { toggleFolder } from "./explorer-preferences.slice";
 import { selectIsSelectMode } from "./explorer.selectors";
-import { useOrderedIdsRef } from "./ordered-ids-context";
-import type { PanelItemType } from "@/widgets/notes-panel/model";
 
-export function useTreeItemClick(id: string, type: PanelItemType) {
+import type { TreeEntity } from "@/shared/model/types";
+import { useOrderedItemsRef } from "./ordered-items-context";
+
+export function useTreeItemClick(id: string, type: TreeEntity) {
   const dispatch = useAppDispatch();
-  const orderedIdsRef = useOrderedIdsRef();
+  const orderedItemsRef = useOrderedItemsRef();
   const isSelectMode = useAppSelector(selectIsSelectMode);
 
   const onFolderToggle = useCallback(() => {
@@ -18,7 +19,9 @@ export function useTreeItemClick(id: string, type: PanelItemType) {
   const onTreeItemClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       if (e.shiftKey) {
-        dispatch(shiftItemClicked({ id, orderedIds: orderedIdsRef.current }));
+        dispatch(
+          shiftItemClicked({ id, type, orderedItems: orderedItemsRef.current }),
+        );
         return;
       }
 

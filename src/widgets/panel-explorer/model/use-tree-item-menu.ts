@@ -28,7 +28,7 @@ export function useTreeItemMenu<T extends string>(
           break;
 
         case "SELECT":
-          dispatch(enterSelectModeFromMenu(id));
+          dispatch(enterSelectModeFromMenu({ id, type }));
           break;
 
         // ---------- Folder ----------
@@ -69,16 +69,14 @@ export function useTreeItemMenu<T extends string>(
           dispatch(startRenaming(id));
           break;
 
-        case "DELETE":
+        case "DELETE": {
           showDialog({
             defaultValues: {
-              entityId: id,
-              entityName: title,
-              entityType: type,
+              entities: [{ id, type }],
             },
           });
           break;
-
+        }
         default:
           break;
       }

@@ -38,3 +38,22 @@ export async function getNote(id: string) {
 export async function getNotes() {
   return db.notes.toArray();
 }
+
+export async function updateNotes(
+  ids: string[],
+  data: Partial<NoteEntity>
+) {
+  const updatedAt = Date.now();
+
+  await db.transaction("rw", db.notes, async () => {
+    await Promise.all(
+      ids.map((id) =>
+        db.notes.update(id, {
+          ...data,
+          updated_at: updatedAt,
+          is_dirty: true,
+        })
+      )
+    );
+  });
+}

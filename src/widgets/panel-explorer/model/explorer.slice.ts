@@ -1,38 +1,42 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { ExplorerType } from "./types";
+import type { ExplorerType, SelectedEntityMeta } from "./types";
+import type { TreeEntity } from "@/shared/model/types";
 
 const initialState: ExplorerType = {
   lastAddedItemId: null,
   semiSelecteditem: null,
   isSelectMode: false,
-  selectedIds: [],
+  selectedEntities: {},
   renamingId: null,
 };
 
 interface ShiftClickPayload {
   id: string;
-  orderedIds: string[];
+  type: TreeEntity;
+  // چون برای محاسبه‌ی رنج به type همه‌ی آیتم‌های وسط رنج هم نیاز داریم
+  orderedItems: SelectedEntityMeta[];
 }
 
 // --- Helper های داخلی (export نمیشن، صرفاً برای حذف تکرار) ---
 
-function toggleSelected(state: ExplorerType, id: string) {
-  const index = state.selectedIds.indexOf(id);
+function toggleSelected(state: ExplorerType, entity: SelectedEntityMeta) {
+  if (state.selectedEntities[entity.id]) {
+    delete state.selectedEntities[entity.id];
 
-  if (index >= 0) {
-    state.selectedIds.splice(index, 1);
-
-    if (state.selectedIds.length === 0) {
+    if (Object.keys(state.selectedEntities).length === 0) {
       state.isSelectMode = false;
     }
     return;
   }
 
-  state.selectedIds.push(id);
+  state.selectedEntities[entity.id] = entity;
+}
+
+function addSelected(state: ExplorerType, entity: SelectedEntityMeta) {
+  state.selectedEntities[entity.id] = entity;
 }
 
 function clearRenamingState(state: ExplorerType) {
-  // فقط اگر rename مربوط به همون آیتم تازه‌ساخته بود، لست‌ادد رو هم پاک کن
   if (state.lastAddedItemId === state.renamingId) {
     state.lastAddedItemId = null;
   }
@@ -47,57 +51,46 @@ const explorer = createSlice({
 
     itemClicked: (
       state,
-      action: PayloadAction<{ id: string; type: "note" | "folder" }>,
+      action: PayloadAction<{ id: string; type: TreeEntity }>,
     ) => {
       const { id, type } = action.payload;
 
-      // کلیک دستی روی هر آیتمی یعنی دیگه نیازی به هایلایت "تازه‌ساخته‌شده" نیست
       if (state.lastAddedItemId !== null) {
         state.lastAddedItemId = null;
       }
 
-      // حالت عادی: فقط focus/semi-select عوض میشه
       if (!state.isSelectMode) {
         state.semiSelecteditem = { id, type };
         return;
       }
 
-      // حالت انتخاب: toggle می‌کنیم
-      toggleSelected(state, id);
+      toggleSelected(state, { id, type });
     },
 
     shiftItemClicked: (state, action: PayloadAction<ShiftClickPayload>) => {
-      const { id, orderedIds } = action.payload;
+      const { id, type, orderedItems } = action.payload;
 
+      const orderedIds = orderedItems.map((item) => item.id);
       const clickedIndex = orderedIds.indexOf(id);
       if (clickedIndex === -1) return;
 
       let anchorId: string | undefined;
 
       if (!state.isSelectMode) {
-        // اولین شیفت‌کلیک، هنوز وارد سلکت مود نشدیم: انکور همون سمی‌سلکتده
         anchorId = state.semiSelecteditem?.id;
 
         if (!anchorId) {
-          // نه سلکت مودیم نه سمی‌سلکتد داریم: فقط همین آیتم رو سلکت کن و وارد سلکت مود شو
-          if (!state.selectedIds.includes(id)) {
-            state.selectedIds.push(id);
-          }
+          addSelected(state, { id, type });
           state.isSelectMode = true;
           return;
         }
       } else {
-        // توی سلکت مود هستیم: انکور دیگه سمی‌سلکتد نیست،
-        // بلکه بر اساس موقعیت کلیک نسبت به رنج فعلیِ سلکت‌شده تعیین می‌شه
-        const selectedIndices = state.selectedIds
+        const selectedIndices = Object.keys(state.selectedEntities)
           .map((selectedId) => orderedIds.indexOf(selectedId))
           .filter((index) => index !== -1);
 
         if (selectedIndices.length === 0) {
-          // هیچ آیتم معتبری توی selectedIds نیست (حالت غیرمنتظره) → فقط همین آیتم رو سلکت کن
-          if (!state.selectedIds.includes(id)) {
-            state.selectedIds.push(id);
-          }
+          addSelected(state, { id, type });
           return;
         }
 
@@ -105,13 +98,10 @@ const explorer = createSlice({
         const maxSelectedIndex = Math.max(...selectedIndices);
 
         if (clickedIndex > maxSelectedIndex) {
-          // پایین‌تر از همه‌ی سلکت‌شده‌ها کلیک شده: انکور اولین آیتم سلکت‌شده‌ست
           anchorId = orderedIds[minSelectedIndex];
         } else if (clickedIndex < minSelectedIndex) {
-          // بالاتر از همه‌ی سلکت‌شده‌ها کلیک شده: انکور آخرین آیتم سلکت‌شده‌ست
           anchorId = orderedIds[maxSelectedIndex];
         } else {
-          // کلیک داخل رنج فعلیه (بین min و max): فرض می‌کنیم انکور همون اولین آیتم سلکت‌شده‌ست
           anchorId = orderedIds[minSelectedIndex];
         }
       }
@@ -124,66 +114,72 @@ const explorer = createSlice({
           ? [anchorIndex, clickedIndex]
           : [clickedIndex, anchorIndex];
 
-      const range = orderedIds.slice(start, end + 1);
+      const range = orderedItems.slice(start, end + 1);
 
-      state.selectedIds = Array.from(new Set([...state.selectedIds, ...range]));
+      for (const item of range) {
+        addSelected(state, item);
+      }
       state.isSelectMode = true;
     },
 
-    toggleItemChecked: (state, action: PayloadAction<string>) => {
+    toggleItemChecked: (
+      state,
+      action: PayloadAction<{ id: string; type: TreeEntity }>,
+    ) => {
       toggleSelected(state, action.payload);
     },
 
     // ورود به حالت سلکت از طریق منوی آیتم (دکمه ...)
     enterSelectModeFromMenu: (
       state,
-      action: PayloadAction<string | undefined>,
+      action: PayloadAction<{ id: string; type: TreeEntity } | undefined>,
     ) => {
-      const id = action.payload;
       state.isSelectMode = true;
 
-      if (id && !state.selectedIds.includes(id)) {
-        state.selectedIds.push(id);
+      if (action.payload) {
+        addSelected(state, action.payload);
       }
     },
 
-    selectAll: (state, action: PayloadAction<string[]>) => {
-      state.selectedIds = action.payload;
+    selectAll: (state, action: PayloadAction<SelectedEntityMeta[]>) => {
+      state.selectedEntities = Object.fromEntries(
+        action.payload.map((entity) => [entity.id, entity]),
+      );
       state.isSelectMode = true;
     },
 
     toggleFolderSelectionWithChildren: (
       state,
-      action: PayloadAction<{ folderId: string; descendantIds: string[] }>,
+      action: PayloadAction<{
+        folder: SelectedEntityMeta;
+        descendants: SelectedEntityMeta[];
+      }>,
     ) => {
-      const { folderId, descendantIds } = action.payload;
+      const { folder, descendants } = action.payload;
 
-      const isCurrentlySelected = state.selectedIds.includes(folderId);
-      const allIds = [folderId, ...descendantIds];
+      const isCurrentlySelected = Boolean(state.selectedEntities[folder.id]);
+      const allEntities = [folder, ...descendants];
 
       if (isCurrentlySelected) {
-        // در حال دی‌سلکت شدنه: فولدر + همه‌ی بچه‌ها حذف بشن
-        const idsToRemove = new Set(allIds);
-        state.selectedIds = state.selectedIds.filter(
-          (id) => !idsToRemove.has(id),
-        );
+        for (const entity of allEntities) {
+          delete state.selectedEntities[entity.id];
+        }
 
-        if (state.selectedIds.length === 0) {
+        if (Object.keys(state.selectedEntities).length === 0) {
           state.isSelectMode = false;
         }
         return;
       }
 
-      // در حال سلکت شدنه: فولدر + همه‌ی بچه‌ها اضافه بشن (بدون تکراری)
-      state.selectedIds = Array.from(
-        new Set([...state.selectedIds, ...allIds]),
-      );
+      for (const entity of allEntities) {
+        addSelected(state, entity);
+      }
       state.isSelectMode = true;
     },
 
     // خروج کامل از حالت سلکت (مثلا دکمه بستن بالک‌بار)
     clearSelection: (state) => {
-      state.selectedIds = [];
+      state.selectedEntities = {};
       state.isSelectMode = false;
       state.semiSelecteditem = null;
     },
@@ -211,6 +207,17 @@ const explorer = createSlice({
     lastAddedItemCleared: (state) => {
       state.lastAddedItemId = null;
     },
+    // -------------------------------------
+    semiSelectedItemChanged: (
+      state,
+      action: PayloadAction<{ id: string; type: TreeEntity } | null>,
+    ) => {
+      state.semiSelecteditem = action.payload;
+    },
+
+    semiSelectedItemCleared: (state) => {
+      state.semiSelecteditem = null;
+    },
   },
 });
 
@@ -226,6 +233,8 @@ export const {
   cancelRenaming,
   finishRenaming,
   itemAdded,
+  semiSelectedItemChanged,
+  semiSelectedItemCleared,
   lastAddedItemCleared,
 } = explorer.actions;
 

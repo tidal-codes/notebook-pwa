@@ -7,8 +7,12 @@ import {
   selectIsSemiSelected,
 } from "./explorer.selectors";
 import type { EntityItemSelectionProps } from "../ui/tree-item";
+import type { TreeEntity } from "@/shared/model/types";
 
-export function useTreeItemSelection(id: string): EntityItemSelectionProps {
+export function useTreeItemSelection(
+  id: string,
+  type: TreeEntity,
+): EntityItemSelectionProps {
   const dispatch = useAppDispatch();
 
   const isSelectMode = useAppSelector(selectIsSelectMode);
@@ -18,8 +22,8 @@ export function useTreeItemSelection(id: string): EntityItemSelectionProps {
   );
 
   const onCheckToggle = useCallback(() => {
-    dispatch(toggleItemChecked(id));
-  }, [dispatch, id]);
+    dispatch(toggleItemChecked({ id, type }));
+  }, [dispatch, id , type]);
 
   return useMemo(
     () => ({ isSelected, isSelectMode, isSemiSelected, onCheckToggle }),

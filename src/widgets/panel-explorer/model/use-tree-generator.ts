@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import type { TreeNode } from "./types";
+import type { SelectedEntityMeta, TreeNode } from "./types";
 import type { NoteEntity } from "@/entities/note/model/types";
 import type { FolderEntity } from "@/entities/folder/model/types";
+
 
 interface Params {
   entities: (NoteEntity | FolderEntity)[];
@@ -9,7 +10,7 @@ interface Params {
 
 interface Result {
   tree: TreeNode[];
-  orderedIds: string[];
+  orderedItems: SelectedEntityMeta[];
 }
 
 export function useTreeGenerator({ entities }: Params): Result {
@@ -55,14 +56,14 @@ export function useTreeGenerator({ entities }: Params): Result {
     }
 
     // این بخش دست‌نخورده می‌مونه؛ چون roots و children از قبل سورت شدن
-    // پیمایش pre-order هم به همون ترتیب orderedIds رو می‌سازه
-    const orderedIds: string[] = [];
+    // پیمایش pre-order هم به همون ترتیب orderedItems رو می‌سازه
+    const orderedItems: SelectedEntityMeta[] = [];
     let counter = 0;
 
     function assignOrder(nodes: TreeNode[]) {
       for (const node of nodes) {
         node.flatOrder = counter++;
-        orderedIds.push(node.id);
+        orderedItems.push({ id: node.id, type: node.type });
         if (node.type === "folder") {
           assignOrder(node.children);
         }
@@ -71,6 +72,6 @@ export function useTreeGenerator({ entities }: Params): Result {
 
     assignOrder(roots);
 
-    return { tree: roots, orderedIds };
+    return { tree: roots, orderedItems };
   }, [entities]);
 }
