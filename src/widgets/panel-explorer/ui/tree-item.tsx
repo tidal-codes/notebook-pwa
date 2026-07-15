@@ -9,7 +9,6 @@ import type { MenuEntry, TreeEntity } from "@/shared/model/types";
 import { getItemPaddingLeft } from "../lib/treeIndent";
 import EntityItemRenameInput from "./entity-item-rename-input";
 
-
 export interface EntityItemSelectionProps {
   isSelected?: boolean;
   isSelectMode?: boolean;
@@ -68,7 +67,6 @@ export default function EntityItem<T extends string>({
     isSelected = false,
     isSelectMode = false,
     isSemiSelected = false,
-    onSelect,
     onCheckToggle,
   } = selection;
 
@@ -91,10 +89,6 @@ export default function EntityItem<T extends string>({
   const entityLabel = isFolder ? "folder" : "note";
 
   function handleItemClick(e: React.MouseEvent<HTMLButtonElement>) {
-    if (!isSelectMode) {
-      onToggleOpen?.();
-    }
-    onSelect?.();
     onItemClick?.(e);
   }
 

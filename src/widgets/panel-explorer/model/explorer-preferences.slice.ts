@@ -22,7 +22,6 @@ const explorerPreferencesSlice = createSlice({
   reducers: {
     toggleFolder(state, action: PayloadAction<string>) {
       const folderId = action.payload;
-
       state.collapsedFolders[folderId] = !state.collapsedFolders[folderId];
     },
     toggleAllFoldersCollapsed(state) {
