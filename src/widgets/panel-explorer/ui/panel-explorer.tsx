@@ -6,6 +6,8 @@ import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
 import {
   selectLastAddedItemId,
   selectSelectedCount,
+  selectSelectedEntities,
+  selectSelectedEntitiesList,
   selectSemiSelectedItem,
 } from "../model/explorer.selectors";
 import ExplorerActionBar from "./explorer-action-bar";
@@ -20,6 +22,8 @@ import { clearSelection } from "../model/explorer.slice";
 import ExplorerTreeLoading from "./explorer-tree-loading";
 import { useSortedEntities } from "../model/use-sorted-entities";
 import { OrderedItemsProvider } from "../model/ordered-items-context";
+import EntityDragDropProvider from "@/features/entity-dnd/model/entity-dnd-provider";
+import useMoveEntities from "@/features/move-entity/use-move-entities";
 
 export default function PanelExplorer() {
   const { isLoading: notes_loading, data: notes } = useNotes();
@@ -37,7 +41,9 @@ export default function PanelExplorer() {
   const dispatch = useAppDispatch();
 
   const selectedCount = useAppSelector(selectSelectedCount);
-  
+  const selectedEntities = useAppSelector(selectSelectedEntities);
+  const { moveEntities } = useMoveEntities();
+
   const semiSelectedItem = useAppSelector(selectSemiSelectedItem);
   const lastAddedItemId = useAppSelector(selectLastAddedItemId);
 
@@ -57,29 +63,36 @@ export default function PanelExplorer() {
   }, [lastAddedItemId, folders, notes]);
 
   return (
-    <OrderedItemsProvider orderedItems={orderedItems}>
-      <div className="flex flex-col h-full">
-        {selectedCount > 0 ? (
-          <ExplorerSelectionActionBar
-            selectedCount={selectedCount}
-            clearSelection={() => dispatch(clearSelection())}
-          />
-        ) : (
-          <ExplorerActionBar
-            isLoading={loading}
-            currentParentFolderId={getParent()}
-          />
-        )}
-        <Separator />
-        {loading ? (
-          <ExplorerTreeLoading />
-        ) : (
-          <ScrollArea className="flex-1 min-h-0 px-6 py-4">
-            <ExplorerTree treeNodes={tree} />
-            <ScrollBar />
-          </ScrollArea>
-        )}
-      </div>
-    </OrderedItemsProvider>
+    <EntityDragDropProvider
+      selectedEntities={selectedEntities}
+      onMove={(entities, targetFolderId) =>
+        moveEntities(entities, targetFolderId)
+      }
+    >
+      <OrderedItemsProvider orderedItems={orderedItems}>
+        <div className="flex flex-col h-full">
+          {selectedCount > 0 ? (
+            <ExplorerSelectionActionBar
+              selectedCount={selectedCount}
+              clearSelection={() => dispatch(clearSelection())}
+            />
+          ) : (
+            <ExplorerActionBar
+              isLoading={loading}
+              currentParentFolderId={getParent()}
+            />
+          )}
+          <Separator />
+          {loading ? (
+            <ExplorerTreeLoading />
+          ) : (
+            <ScrollArea className="flex-1 min-h-0 px-6 py-4">
+              <ExplorerTree treeNodes={tree} />
+              <ScrollBar />
+            </ScrollArea>
+          )}
+        </div>
+      </OrderedItemsProvider>
+    </EntityDragDropProvider>
   );
 }

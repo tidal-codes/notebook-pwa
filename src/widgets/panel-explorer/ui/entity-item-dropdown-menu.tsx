@@ -1,15 +1,14 @@
-import type { MenuEntry } from "@/shared/model/types";
+import type { MenuEntry, TreeEntity } from "@/shared/model/types";
 import DropdownMenu from "@/shared/ui/dropdown-menu";
-import type { PanelItemType } from "@/widgets/notes-panel/model";
 import type { ReactNode } from "react";
 
 interface Props<T extends string> {
   entityId: string;
-  entityType: PanelItemType;
+  entityType: TreeEntity;
   onMenuClick: (
     actionId: T,
     entityId: string,
-    entityType: PanelItemType,
+    entityType: TreeEntity,
   ) => void;
   children: ReactNode;
   dropdownMenuItems: MenuEntry<T>[];
