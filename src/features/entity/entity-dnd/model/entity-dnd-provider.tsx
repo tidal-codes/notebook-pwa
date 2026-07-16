@@ -9,7 +9,7 @@ import {
   type DragEndEvent,
   type DragOverEvent,
 } from "@dnd-kit/core";
-import type { DraggingEntity } from "../model/types";
+import type { DraggingEntity } from "./types";
 import { useFolderNameById } from "../lib/use-folder-name-by-id";
 import EntityDragOverlayContent from "../ui/entity-drag-overlay-content";
 

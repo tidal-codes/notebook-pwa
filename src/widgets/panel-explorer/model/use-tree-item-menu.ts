@@ -5,12 +5,13 @@ import {
   itemAdded,
   startRenaming,
 } from "./explorer.slice";
-import { useConfirmDeleteDialogActions } from "@/features/delete-entity/confirm-delete-dialog-provider";
+import { useConfirmDeleteDialogActions } from "@/features/entity/delete-entity/confirm-delete-dialog-provider";
 import type { MenuEntry, TreeEntity } from "@/shared/model/types";
 import type { EntityItemMenuProps } from "../ui/tree-item";
-import useAddNewEntity from "@/features/add-new-entity/model/use-add-new-entity";
-import useCloneEntity from "@/features/clone-entity/use-clone-entity";
-import { useMoveEntityDialogActions } from "@/features/move-entity/move-entity-dialog-provider";
+import useAddNewEntity from "@/features/entity/add-new-entity/model/use-add-new-entity";
+import useCloneEntity from "@/features/entity/clone-entity/use-clone-entity";
+import { useMoveEntityDialogActions } from "@/features/entity/move-entity/move-entity-dialog-provider";
+import useOpenNote from "@/features/tabs/use-open-note";
 
 export function useTreeItemMenu<T extends string>(
   menuItems: MenuEntry<T>[],
@@ -23,6 +24,7 @@ export function useTreeItemMenu<T extends string>(
   const { showDialog: showMoveEntityDialog } = useMoveEntityDialogActions();
   const { createItem } = useAddNewEntity();
   const { cloneEntity } = useCloneEntity();
+  const { handleOpenNote } = useOpenNote();
 
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
@@ -38,8 +40,7 @@ export function useTreeItemMenu<T extends string>(
         // ---------- Note ----------
 
         case "OPEN_NEW_TAB":
-          // TODO
-          // dispatch(openNoteInNewTab(id))
+          handleOpenNote(id, "NEW_TAB");
           break;
 
         case "SELECT":

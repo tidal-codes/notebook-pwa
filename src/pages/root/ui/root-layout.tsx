@@ -5,13 +5,13 @@ import {
   ResizableHandle,
 } from "@/shared/ui/resizable";
 import AppControls from "@/widgets/app-controls/ui/app-controls";
-import { ConfirmDeleteDialogProvider } from "@/features/delete-entity/confirm-delete-dialog-provider";
-import ConfirmDeleteDialog from "@/features/delete-entity/confirm-delete-dialog";
+import { ConfirmDeleteDialogProvider } from "@/features/entity/delete-entity/confirm-delete-dialog-provider";
+import ConfirmDeleteDialog from "@/features/entity/delete-entity/confirm-delete-dialog";
 import { Toaster } from "@/shared/ui/sonner";
 import AppPanel from "@/widgets/app-panel";
 import EditorArea from "@/widgets/editor-area";
-import MoveEntityDialog from "@/features/move-entity/move-entity-dialog";
-import { MoveEntityDialogProvider } from "@/features/move-entity/move-entity-dialog-provider";
+import MoveEntityDialog from "@/features/entity/move-entity/move-entity-dialog";
+import { MoveEntityDialogProvider } from "@/features/entity/move-entity/move-entity-dialog-provider";
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (

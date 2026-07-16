@@ -1,5 +1,5 @@
-import { useConfirmDeleteDialogActions } from "@/features/delete-entity/confirm-delete-dialog-provider";
-import useDeleteEntities from "@/features/delete-entity/use-delete-entity";
+import { useConfirmDeleteDialogActions } from "@/features/entity/delete-entity/confirm-delete-dialog-provider";
+import useDeleteEntities from "@/features/entity/delete-entity/use-delete-entity";
 import type { MenuEntry } from "@/shared/model/types";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -21,7 +21,7 @@ import {
 } from "../model/explorer.selectors";
 import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
 import { semiSelectedItemCleared } from "../model/explorer.slice";
-import { useMoveEntityDialogActions } from "@/features/move-entity/move-entity-dialog-provider";
+import { useMoveEntityDialogActions } from "@/features/entity/move-entity/move-entity-dialog-provider";
 
 interface Props {
   selectedCount: number;

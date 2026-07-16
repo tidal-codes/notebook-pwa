@@ -11,9 +11,9 @@ import useTreeItem from "../model/use-tree-item";
 import TreeItem from "./tree-item";
 import { FOLDER_MENU_ITEMS } from "../model/constants";
 import { getGuideLineLeft } from "../lib/treeIndent";
-import { useDraggableEntity } from "@/features/entity-dnd/lib/use-draggable-entity";
-import { useDroppableFolder } from "@/features/entity-dnd/lib/use-dropable-folder";
-import { useMergeRefs } from "@/features/entity-dnd/lib/use-merge-refs";
+import { useDraggableEntity } from "@/features/entity/entity-dnd/lib/use-draggable-entity";
+import { useDroppableFolder } from "@/features/entity/entity-dnd/lib/use-dropable-folder";
+import { useMergeRefs } from "@/features/entity/entity-dnd/lib/use-merge-refs";
 
 interface Props {
   id: string;

@@ -1,4 +1,4 @@
-import useAddNewEntity from "@/features/add-new-entity/model/use-add-new-entity";
+import useAddNewEntity from "@/features/entity/add-new-entity/model/use-add-new-entity";
 import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import {

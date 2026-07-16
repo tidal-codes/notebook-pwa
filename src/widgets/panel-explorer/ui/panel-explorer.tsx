@@ -22,8 +22,8 @@ import { clearSelection } from "../model/explorer.slice";
 import ExplorerTreeLoading from "./explorer-tree-loading";
 import { useSortedEntities } from "../model/use-sorted-entities";
 import { OrderedItemsProvider } from "../model/ordered-items-context";
-import EntityDragDropProvider from "@/features/entity-dnd/model/entity-dnd-provider";
-import useMoveEntities from "@/features/move-entity/use-move-entities";
+import EntityDragDropProvider from "@/features/entity/entity-dnd/model/entity-dnd-provider";
+import useMoveEntities from "@/features/entity/move-entity/use-move-entities";
 
 export default function PanelExplorer() {
   const { isLoading: notes_loading, data: notes } = useNotes();

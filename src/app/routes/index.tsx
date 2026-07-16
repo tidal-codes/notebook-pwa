@@ -3,7 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 export default createBrowserRouter([
   {
-    path: "/:panel?",
+    path: "/:panel?/:noteId?",
     element: <RootPage />,
   },
 ])

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
 import { cancelRenaming } from "./explorer.slice";
 import { selectIsRenamingById } from "./explorer.selectors";
-import useRenameEntity from "@/features/rename-entity/use-rename-entity";
+import useRenameEntity from "@/features/entity/rename-entity/use-rename-entity";
 import type { EntityItemRenameProps } from "../ui/tree-item";
 import type { TreeEntity } from "@/shared/model/types";
 
