@@ -106,13 +106,13 @@ export default function ExplorerSelectionActionBar({
   return (
     <div className="w-full flex items-center justify-between px-4 py-3">
       <div className="flex items-center gap-3">
-        <Button size="icon-lg" variant="ghost" onClick={clearSelection}>
-          <XCircle />
+        <Button size="icon-sm" variant="ghost" onClick={clearSelection}>
+          <XCircle className="text-muted-foreground" />
         </Button>
         <Separator orientation="vertical" />
         <div className="flex items-center gap-2">
           <Badge>{selectedCount}</Badge>
-          <p>selected items</p>
+          <p>item selected</p>
         </div>
       </div>
       <div>
@@ -120,7 +120,7 @@ export default function ExplorerSelectionActionBar({
           items={selectedActionsMenuItems}
           onSelect={(action) => selectionActions[action]()}
           trigger={
-            <Button size="lg">
+            <Button className="text-muted-foreground" size="icon-sm" variant="ghost">
               <EllipsisVerticalIcon />
             </Button>
           }

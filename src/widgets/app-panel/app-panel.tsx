@@ -29,7 +29,7 @@ export default function AppPanel() {
   const navigate = useNavigate();
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-sidebar">
       <div className="flex items-center gap-3 bg-card px-5 py-2">
         {panelItems.map((item) => (
           <Tooltip key={item.title} content={item.title} side="bottom">

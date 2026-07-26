@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { X } from "lucide-react";
 import { Dialog, DialogContent } from "./dialog";
+import { ScrollArea, ScrollBar } from "./scroll-area";
 
 export type DialogItem = {
   id: string | null;
@@ -69,7 +70,7 @@ export function SearchableListDialog({
         نکته: کلاس‌های داخل DialogContent برای استایل‌دهی شبیه به عکس‌های شما تنظیم شده‌اند. 
         کلاس [&>button]:hidden دکمه close پیش‌فرض shadcn را مخفی میکند تا دکمه کاستوم خودمان را بگذاریم.
       */}
-      <DialogContent className="max-w-xl p-0 gap-0 bg-[#1e1e1e] border-zinc-800 text-zinc-200 [&>button]:hidden shadow-2xl">
+      <DialogContent className="max-w-2xl sm:max-w-2xl p-0 gap-0 bg-background border [&>button]:hidden shadow-2xl">
         {/* هدر شامل اینپوت سرچ و دکمه بستن */}
         <div className="flex items-center px-4 py-3 border-b border-zinc-800">
           <input
@@ -90,7 +91,7 @@ export function SearchableListDialog({
         </div>
 
         {/* بدنه شامل لیست یا حالت خالی */}
-        <div className="max-h-[350px] overflow-y-auto p-2">
+        <ScrollArea className="max-h-[400px] overflow-y-auto p-2">
           {filteredItems.length > 0 ? (
             // رندر کردن لیست آیتم‌ها
             <div className="flex flex-col gap-0.5">
@@ -98,7 +99,7 @@ export function SearchableListDialog({
                 <button
                   key={item.id}
                   onClick={() => handleSelect(item.id)}
-                  className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-zinc-800 transition-colors text-zinc-300"
+                  className="w-full text-left px-3 py-2 rounded-md hover:bg-item-hover transition-colors text-base"
                 >
                   {item.title}
                 </button>
@@ -119,7 +120,8 @@ export function SearchableListDialog({
               </p>
             </div>
           )}
-        </div>
+          <ScrollBar />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

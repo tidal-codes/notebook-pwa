@@ -43,7 +43,7 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         align={align}
         className={cn(
-          "z-50 max-h-(--radix-dropdown-menu-content-available-height)  min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 ",
+          "z-50 max-h-(--radix-dropdown-menu-content-available-height)  min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-background border border-border p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 ",
           className,
         )}
         {...props}
@@ -281,14 +281,17 @@ function renderEntries<TId extends string>(
           <DropdownMenuItem
             key={entry.id}
             disabled={entry.disabled}
+            variant={entry.destructive ? "destructive" : "default"}
             onSelect={() => onSelect(entry.id)}
-            className={cn(
-              entry.destructive && "text-destructive focus:text-destructive",
-              entry.className,
-            )}
+            className={cn(entry.className)}
           >
             {entry.icon && (
-              <span className="mr-2 flex h-4 w-4 items-center justify-center">
+              <span
+                className={cn(
+                  "mr-2 flex h-4 w-4 items-center justify-center text-muted-foreground",
+                  { "text-destructive": entry.destructive },
+                )}
+              >
                 {entry.icon}
               </span>
             )}
@@ -392,7 +395,7 @@ export default function DropdownMenu<TId extends string = string>({
   onCheckedChange,
   onRadioChange,
   trigger,
-  align = "end",
+  align = "center",
   side = "bottom",
   sideOffset = 4,
   contentClassName,

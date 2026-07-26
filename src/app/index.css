@@ -6,73 +6,136 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* =========================================================================
+   پالت رنگی برگرفته از تم دارک ابسیدین (Obsidian)
+   نگاشت توکن‌های اصلی shadcn + چند توکن اختصاصی جدید برای الگوهای رابط‌کاربری
+   ابسیدین (منوی راست‌کلیک، کال‌اوت/Note، تب‌ها، هاور/اکتیو آیتم‌های لیست)
+   ========================================================================= */
+
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.52 0.105 223.128);
-  --primary-foreground: oklch(0.984 0.019 200.873);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
+  /* --- سطوح پایه (لایت مود - ساخته شده بر اساس همون رنگ‌های دارک ابسیدین) --- */
+  --background: oklch(1 0 0); /* پس‌زمینه اصلی پنل */
+  --foreground: oklch(0.227 0.004 286.092); /* متن اصلی */
+  --card: oklch(1 0 0); /* کارت / کانتینر */
+  --card-foreground: oklch(0.227 0.004 286.092);
+  --popover: oklch(1 0 0); /* منوی راست‌کلیک / دراپ‌داون */
+  --popover-foreground: oklch(0.227 0.004 286.092);
+
+  /* --- برند / اکسنت اصلی (رنگ بنفش تگ‌ها و بج‌ها در اسکرین‌شات) --- */
+  --primary: oklch(0.528 0.186 284.94);
+  --primary-foreground: oklch(0.985 0 0);
+
+  --secondary: oklch(0.955 0.001 286.375); /* پس‌زمینه ثانویه / نوار تب */
+  --secondary-foreground: oklch(0.227 0.004 286.092);
+
+  --muted: oklch(0.964 0.001 286.375); /* سطح فرورفته/کم‌رنگ */
+  --muted-foreground: oklch(
+    0.533 0.006 286.188
+  ); /* متن کم‌اهمیت، بردکرامب، تایم‌استمپ */
+
+  --accent: oklch(0.926 0.003 286.347); /* هاور / سلکت آیتم */
+  --accent-foreground: oklch(0.227 0.004 286.092);
+
+  --destructive: oklch(0.574 0.19 24.241); /* قرمز آیتم Delete */
+  --destructive-bg: klch(0.574 0.19 24.241 / 0.3);
+
+  --border: oklch(0.913 0.003 286.346);
+  --input: oklch(0.913 0.003 286.346);
+  --ring: oklch(0.533 0.006 286.188);
+
   --chart-1: oklch(0.871 0.006 286.286);
   --chart-2: oklch(0.552 0.016 285.938);
   --chart-3: oklch(0.442 0.017 285.786);
   --chart-4: oklch(0.37 0.013 285.805);
   --chart-5: oklch(0.274 0.006 286.033);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.609 0.126 221.723);
-  --sidebar-primary-foreground: oklch(0.984 0.019 200.873);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
+
+  /* --- سایدبار --- */
+  --sidebar: oklch(0.973 0.001 286.375);
+  --sidebar-foreground: oklch(0.227 0.004 286.092);
+  --sidebar-primary: oklch(0.528 0.186 284.94);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.944 0.003 286.349); /* هاور آیتم سایدبار */
+  --sidebar-accent-foreground: oklch(0.227 0.004 286.092);
+  --sidebar-border: oklch(0.913 0.003 286.346);
+  --sidebar-ring: oklch(0.533 0.006 286.188);
+
+  /* --- توکن‌های اختصاصی سبک ابسیدین --- */
+  --item-hover: oklch(0.944 0.003 286.349); /* هاور ردیف در لیست/فایل‌تری/منو */
+  --item-active: oklch(
+    0.914 0.005 286.293
+  ); /* آیتم انتخاب‌شده / فولدر بازشده / تب فعال */
+  --tab-inactive: oklch(0.955 0.001 286.375); /* پس‌زمینه تب غیرفعال */
+
+  --info-background: oklch(0.96 0.014 244.716); /* پس‌زمینه کال‌اوت Note */
+  --info-border: oklch(0.63 0.127 246.583); /* نوار آبی کنار کال‌اوت */
+  --info-foreground: oklch(0.529 0.121 246.671); /* متن آبی عنوان کال‌اوت */
+
+  --radius: 0.425rem;
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.45 0.085 224.283);
-  --primary-foreground: oklch(0.984 0.019 200.873);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
+  /* --- سطوح پایه (دارک مود - دقیقاً برگرفته از اسکرین‌شات ابسیدین) --- */
+  --background: oklch(0.239 0 89.876); /* #1f1f1f پس‌زمینه اصلی پنل */
+  --foreground: oklch(0.907 0 89.876); /* #e0e0e0 متن اصلی */
+  --card: oklch(0.261 0.004 286.141); /* #242426 */
+  --card-foreground: oklch(0.907 0 89.876);
+  --popover: oklch(0.29 0.004 286.173); /* #2b2b2d منوی راست‌کلیک */
+  --popover-foreground: oklch(0.907 0 89.876);
+
+  /* --- برند / اکسنت اصلی (بنفش بج‌ها و تگ‌ها) --- */
+  --primary: oklch(0.603 0.17 286.435); /* #7c6ce0 */
+  --primary-foreground: oklch(0.985 0 0);
+
+  --secondary: oklch(0.286 0.004 286.169); /* #2a2a2c نوار تب / سطح ثانویه */
+  --secondary-foreground: oklch(0.907 0 89.876);
+
+  --muted: oklch(0.257 0.004 286.136); /* #232325 */
+  --muted-foreground: oklch(
+    0.637 0.003 286.316
+  ); /* #8b8b8d بردکرامب / متن کم‌اهمیت */
+
+  --accent: oklch(0.31 0.004 286.192); /* #303032 هاور/سلکت آیتم */
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+
+  --destructive: oklch(0.637 0.171 22.07); /* #e0575a قرمز Delete */
+  --destructive-bg: oklch(63.673% 0.17146 22.467 / 0.3);
+
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
+  --ring: oklch(0.637 0.003 286.316);
+
   --chart-1: oklch(0.871 0.006 286.286);
   --chart-2: oklch(0.552 0.016 285.938);
   --chart-3: oklch(0.442 0.017 285.786);
   --chart-4: oklch(0.37 0.013 285.805);
   --chart-5: oklch(0.274 0.006 286.033);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.715 0.143 215.221);
-  --sidebar-primary-foreground: oklch(0.302 0.056 229.695);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
+
+  /* --- سایدبار --- */
+  --sidebar: oklch(0.218 0 89.876); /* #1a1a1a */
+  --sidebar-foreground: oklch(0.907 0 89.876);
+  --sidebar-primary: oklch(0.603 0.17 286.435);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.281 0 89.876); /* #292929 هاور آیتم سایدبار */
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.637 0.003 286.316);
+
+  /* --- توکن‌های اختصاصی سبک ابسیدین --- */
+  --item-hover: oklch(
+    0.281 0 89.876
+  ); /* #292929 هاور ردیف در لیست/فایل‌تری/منو */
+  --item-active: oklch(
+    0.322 0.004 286.201
+  ); /* #333335 آیتم انتخاب‌شده / فولدر بازشده / تب فعال */
+  --tab-inactive: oklch(0.218 0 89.876); /* #1a1a1a پس‌زمینه تب غیرفعال */
+
+  --info-background: oklch(
+    0.25 0.029 247.074
+  ); /* #16232f پس‌زمینه کال‌اوت Note */
+  --info-border: oklch(0.63 0.127 246.583); /* #3f8fd1 نوار آبی کنار کال‌اوت */
+  --info-foreground: oklch(
+    0.76 0.093 243.559
+  ); /* #7cb8e8 متن آبی عنوان کال‌اوت */
 }
 
 @theme inline {
@@ -95,6 +158,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --colors-destructive-bg: var(--destructive-bg);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -109,6 +173,15 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+
+  /* نگاشت توکن‌های اختصاصی ابسیدین برای استفاده به‌صورت کلاس تیلویند (bg-item-hover و ...) */
+  --color-item-hover: var(--item-hover);
+  --color-item-active: var(--item-active);
+  --color-tab-inactive: var(--tab-inactive);
+  --color-info-background: var(--info-background);
+  --color-info-border: var(--info-border);
+  --color-info-foreground: var(--info-foreground);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -131,6 +204,5 @@
 }
 
 [data-slot="resizable-panel"] > div {
-  overflow: hidden !important; 
+  overflow: hidden !important;
 }
-

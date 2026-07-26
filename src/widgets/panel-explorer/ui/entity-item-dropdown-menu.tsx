@@ -28,6 +28,7 @@ export default function EntityItemDropdownMenu<T extends string>({
       onOpenChange={onOpenChange}
       items={dropdownMenuItems}
       onSelect={(actionId) => onMenuClick(actionId, entityId, entityType)}
+      sideOffset={13}
       trigger={children}
     />
   );

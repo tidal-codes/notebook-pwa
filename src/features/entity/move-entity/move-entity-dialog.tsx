@@ -1,7 +1,4 @@
-import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
-import type { FolderEntity } from "@/entities/folder/model/types";
 import { SearchableListDialog } from "@/shared/ui/searchable-list-dialog";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   useMoveEntityDialogActions,
   useMoveEntityDialogData,
@@ -18,7 +15,6 @@ export default function MoveEntityDialog() {
   const getFoldersData = useGetFoldersData();
   const { defaultValues, onSubmit } = useMoveEntityDialogData();
   const { moveEntities } = useMoveEntities();
-  const queryClient = useQueryClient();
 
   const [items, setitems] = useState<MoveEntityDialogItem[]>([]);
 

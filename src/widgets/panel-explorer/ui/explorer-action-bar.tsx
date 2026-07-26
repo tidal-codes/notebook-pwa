@@ -56,34 +56,44 @@ export default function ExplorerActionBar({
     type === "folder" && dispatch(startRenaming(id));
   }
   return (
-    <div className="w-full px-2 py-3">
+    <div className="w-full p-2">
       <div className="w-full flex items-center justify-center gap-2">
         <Tooltip content="add note" side="bottom">
           <Button
-            size="icon-lg"
+            size="icon-sm"
+            variant="ghost"
             onClick={() =>
               createItem("note", currentParentFolderId, onEntityCreated)
             }
             disabled={isLoading}
           >
-            <Edit />
+            <Edit className="size-5 text-muted-foreground" />
           </Button>
         </Tooltip>
         <Tooltip content="add folder" side="bottom">
           <Button
-            size="icon-lg"
+            size="icon-sm"
+            variant="ghost"
             onClick={() =>
               createItem("folder", currentParentFolderId, onEntityCreated)
             }
             disabled={isLoading}
           >
-            <FolderPlus />
+            <FolderPlus className="size-5 text-muted-foreground" />
           </Button>
         </Tooltip>
         <SortActionMenu sortBy={sortBy} onSortByChange={handleChangeSort} />
-        <Tooltip content={allFoldersCollapsed ? "collapse all" : "expand all"}>
-          <Button size="icon-lg" onClick={handleToggleFoldersCollapse}>
-            {allFoldersCollapsed ? <ChevronsDownUpIcon /> : <ChevronsUpDown />}
+        <Tooltip content={allFoldersCollapsed ? "collapse all" : "expand all"} side="bottom">
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            onClick={handleToggleFoldersCollapse}
+          >
+            {allFoldersCollapsed ? (
+              <ChevronsDownUpIcon className="size-5 text-muted-foreground" />
+            ) : (
+              <ChevronsUpDown className="size-5 text-muted-foreground" />
+            )}
           </Button>
         </Tooltip>
       </div>

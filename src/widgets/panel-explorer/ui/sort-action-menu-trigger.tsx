@@ -7,8 +7,8 @@ type ActionTriggerProps = ComponentPropsWithoutRef<typeof Button>;
 const SortActionMenuTrigger = forwardRef<HTMLButtonElement, ActionTriggerProps>(
   ({ children, ...props }, ref) => {
     return (
-      <Tooltip content="change sort order">
-        <Button ref={ref} size="icon-lg" {...props}>
+      <Tooltip content="change sort order" side="bottom">
+        <Button ref={ref} size="icon-sm" variant="ghost" {...props}>
           {children}
         </Button>
       </Tooltip>

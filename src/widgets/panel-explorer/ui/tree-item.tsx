@@ -1,7 +1,13 @@
 import React from "react";
 import { cn } from "@/shared/lib/utils";
 import { Button, buttonVariants } from "@/shared/ui/button";
-import { ChevronRight, Ellipsis } from "lucide-react";
+import {
+  ChevronRight,
+  Ellipsis,
+  FileText,
+  Folder,
+  FolderOpen,
+} from "lucide-react";
 import { Checkbox } from "@/shared/ui/checkbox";
 import EntityItemContextMenu from "./entity-item-context-menu";
 import EntityItemDropdownMenu from "./entity-item-dropdown-menu";
@@ -48,6 +54,29 @@ export interface EntityItemProps<T extends string> {
   menu: EntityItemMenuProps<T>;
 }
 
+function EntityTypeIcon({
+  isFolder,
+  isOpen,
+}: {
+  isFolder: boolean;
+  isOpen: boolean;
+}) {
+  if (isFolder) {
+    return isOpen ? (
+      <FolderOpen
+        className="h-4 w-4 shrink-0 text-muted-foreground"
+        aria-hidden
+      />
+    ) : (
+      <Folder className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+    );
+  }
+
+  return (
+    <FileText className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+  );
+}
+
 export default function EntityItem<T extends string>({
   id,
   title,
@@ -55,10 +84,8 @@ export default function EntityItem<T extends string>({
   isOpen = false,
   isActive = false,
   depth = 0,
-
   onItemClick,
   onToggleOpen,
-
   selection = {},
   rename = {},
   menu,
@@ -110,7 +137,7 @@ export default function EntityItem<T extends string>({
         <div
           className={cn(
             "group relative flex h-8 items-center gap-1.5 rounded-md pr-2",
-            "hover:bg-accent",
+            "hover:bg-item-hover",
             isActive && "bg-accent",
             isSemiSelected && "bg-primary/10 hover:bg-primary/15",
             isSelected && "bg-primary/15 hover:bg-primary/20",
@@ -123,7 +150,7 @@ export default function EntityItem<T extends string>({
               variant="ghost"
               onClick={handleItemClick}
               aria-label={`Open ${entityLabel} ${title}`}
-              className="absolute inset-0 h-full w-full justify-start rounded-md p-0 focus:ring-2 focus:ring-ring"
+              className="absolute inset-0 h-full w-full justify-start rounded-md p-0 focus:ring-2 focus:ring-ring hover:bg-transparent"
             />
           )}
 
@@ -138,8 +165,8 @@ export default function EntityItem<T extends string>({
               className={cn(
                 "pointer-events-auto overflow-hidden transition-all duration-200 ease-out",
                 isSelectMode
-                  ? "w-5 opacity-100 scale-100 mr-1"
-                  : "w-0 opacity-0 scale-75 mr-0",
+                  ? "mr-1 w-5 scale-100 opacity-100"
+                  : "mr-0 w-0 scale-75 opacity-0",
               )}
             >
               <Checkbox
@@ -158,7 +185,7 @@ export default function EntityItem<T extends string>({
                 variant="ghost"
                 onClick={handleToggleOpen}
                 aria-label={isOpen ? "Collapse folder" : "Expand folder"}
-                className="pointer-events-auto shrink-0"
+                className="pointer-events-auto shrink-0 size-6"
               >
                 <ChevronRight
                   className={cn(
@@ -184,12 +211,15 @@ export default function EntityItem<T extends string>({
                 onCancel={onRenameCancel}
               />
             ) : (
-              <span
-                className="min-w-0 flex-1 truncate text-start text-sm"
-                title={title}
-              >
-                {title}
-              </span>
+              <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                <EntityTypeIcon isFolder={isFolder} isOpen={isOpen} />
+                <span
+                  className="min-w-0 flex-1 truncate text-start text-sm"
+                  title={title}
+                >
+                  {title}
+                </span>
+              </div>
             )}
           </div>
 
@@ -205,7 +235,12 @@ export default function EntityItem<T extends string>({
                 variant="ghost"
                 size="icon-sm"
                 aria-label={`More actions for ${title}`}
-                className="relative z-10"
+                className={cn(
+                  "relative z-10 size-6 opacity-0 group-hover:opacity-100",
+                  {
+                    "opacity-100": isAnyMenuOpen,
+                  },
+                )}
               >
                 <Ellipsis />
               </Button>

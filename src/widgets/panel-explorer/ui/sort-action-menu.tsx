@@ -50,7 +50,7 @@ export default function SortActionMenu({ sortBy, onSortByChange }: Props) {
       onRadioChange={(_groupId, value) => onSortByChange(value)}
       trigger={
         <SortActionMenuTrigger>
-          <SortAsc />
+          <SortAsc className="size-5 text-muted-foreground"/>
         </SortActionMenuTrigger>
       }
     />
