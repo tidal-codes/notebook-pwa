@@ -1,36 +1,21 @@
-import { type PropsWithChildren } from "react";
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from "@/shared/ui/resizable";
-import AppControls from "@/widgets/app-controls/ui/app-controls";
 import { ConfirmDeleteDialogProvider } from "@/features/entity/delete-entity/confirm-delete-dialog-provider";
 import ConfirmDeleteDialog from "@/features/entity/delete-entity/confirm-delete-dialog";
 import { Toaster } from "@/shared/ui/sonner";
-import AppPanel from "@/widgets/app-panel";
-import EditorArea from "@/widgets/editor-area";
 import MoveEntityDialog from "@/features/entity/move-entity/move-entity-dialog";
 import { MoveEntityDialogProvider } from "@/features/entity/move-entity/move-entity-dialog-provider";
+import AppControll from "./app-controll";
+import MainPanel from "./main-panel";
 
-export default function RootLayout({ children }: PropsWithChildren) {
+export default function RootLayout() {
   return (
     <ConfirmDeleteDialogProvider>
       <MoveEntityDialogProvider>
         <Toaster />
         <ConfirmDeleteDialog />
         <MoveEntityDialog />
-        <div className="h-screen flex items-center">
-          <AppControls variant="sidebar" />
-          <ResizablePanelGroup className="flex-1">
-            <ResizablePanel>
-              <AppPanel />
-            </ResizablePanel>
-            <ResizableHandle className="ring-primary data-[separator='hover']:ring-2  data-[separator='active']:ring-2" />
-            <ResizablePanel>
-              <EditorArea />
-            </ResizablePanel>
-          </ResizablePanelGroup>
+        <div className="h-screen flex flex-col md:flex-row items-center">
+          <AppControll />
+          <MainPanel/>
         </div>
       </MoveEntityDialogProvider>
     </ConfirmDeleteDialogProvider>
