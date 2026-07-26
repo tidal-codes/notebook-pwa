@@ -7,7 +7,6 @@ import {
   selectLastAddedItemId,
   selectSelectedCount,
   selectSelectedEntities,
-  selectSelectedEntitiesList,
   selectSemiSelectedItem,
 } from "../model/explorer.selectors";
 import ExplorerActionBar from "./explorer-action-bar";
@@ -70,7 +69,7 @@ export default function PanelExplorer() {
       }
     >
       <OrderedItemsProvider orderedItems={orderedItems}>
-        <div className="flex flex-col h-full">
+        <div className="flex h-full min-w-0 flex-col">
           {selectedCount > 0 ? (
             <ExplorerSelectionActionBar
               selectedCount={selectedCount}
@@ -86,9 +85,12 @@ export default function PanelExplorer() {
           {loading ? (
             <ExplorerTreeLoading />
           ) : (
-            <ScrollArea className="flex-1 min-h-0 px-6 py-4">
-              <ExplorerTree treeNodes={tree} />
+            <ScrollArea className="min-h-0 flex-1 px-6 py-4">
+              <div className="min-w-[12rem]">
+                <ExplorerTree treeNodes={tree} />
+              </div>
               <ScrollBar />
+              <ScrollBar orientation="horizontal" />
             </ScrollArea>
           )}
         </div>

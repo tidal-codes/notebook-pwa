@@ -15,6 +15,7 @@ export default function TabControllerSectionHistory() {
     <div className="flex items-center gap-2">
       <Button
         size="icon-sm"
+        variant="outline"
         disabled={!canStepBack}
         onClick={() => handleTabHistoryStep("back")}
       >
@@ -22,6 +23,7 @@ export default function TabControllerSectionHistory() {
       </Button>
       <Button
         size="icon-sm"
+        variant="outline"
         disabled={!canStepForward}
         onClick={() => handleTabHistoryStep("forward")}
       >

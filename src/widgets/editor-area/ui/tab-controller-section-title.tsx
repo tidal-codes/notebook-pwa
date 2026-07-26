@@ -11,5 +11,5 @@ export default function TabControllerSectionTitle({ noteId }: Props) {
     select: (data) => data.find((note) => note.id === noteId),
   });
 
-  return <p>{note?.name || "new tab"}</p>;
+  return <p className="text-xs text-muted-foreground">{note?.name || "new tab"}</p>;
 }

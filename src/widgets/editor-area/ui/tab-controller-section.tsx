@@ -16,7 +16,7 @@ export default function TabControllerSection({ noteId }: Props) {
         <TabControllerSectionTitle noteId={noteId} />
       </div>
       <div>
-        <Button size="icon-sm">
+        <Button size="icon-sm" variant="ghost">
           <EllipsisVertical />
         </Button>
       </div>
