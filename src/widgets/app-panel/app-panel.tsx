@@ -2,9 +2,17 @@ import { Separator } from "@/shared/ui/separator";
 import PanelExplorer from "../panel-explorer";
 import useAppPanel from "./use-app-panel";
 import { Button } from "@/shared/ui/button";
-import { Bookmark, CircleX, FolderClosed, Search, SidebarClose } from "lucide-react";
+import {
+  Bookmark,
+  CircleX,
+  FolderClosed,
+  Search,
+  SidebarClose,
+} from "lucide-react";
 import Tooltip from "@/shared/ui/tooltip";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "@/shared/config/store/hooks";
+import { closeAppDrawer } from "@/shared/model/app-ui.store";
 
 const panelItems = [
   {
@@ -31,6 +39,11 @@ interface Props {
 export default function AppPanel({ isDrawer = false }: Props) {
   const { panel } = useAppPanel();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  function handleCloseAppPanel() {
+    dispatch(closeAppDrawer());
+  }
 
   return (
     <div className="h-full flex flex-col bg-sidebar">
@@ -49,11 +62,17 @@ export default function AppPanel({ isDrawer = false }: Props) {
             </Tooltip>
           ))}
         </div>
-        <div>
-          <Button variant="ghost" size="icon-sm">
-            <SidebarClose/>
-          </Button>
-        </div>
+        {isDrawer ? (
+          <div>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleCloseAppPanel}
+            >
+              <SidebarClose />
+            </Button>
+          </div>
+        ) : null}
       </div>
       <div className="flex-1 min-h-0">
         {panel === "explorer" ? (

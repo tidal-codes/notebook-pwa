@@ -10,7 +10,7 @@ export default function RootLayout() {
   return (
     <ConfirmDeleteDialogProvider>
       <MoveEntityDialogProvider>
-        <Toaster />
+        <Toaster position="top-center"/>
         <ConfirmDeleteDialog />
         <MoveEntityDialog />
         <div className="h-screen flex flex-col md:flex-row items-center">
