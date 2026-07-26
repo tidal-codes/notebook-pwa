@@ -8,6 +8,7 @@ import {
   FolderClosed,
   Search,
   SidebarClose,
+  X,
 } from "lucide-react";
 import Tooltip from "@/shared/ui/tooltip";
 import { useNavigate } from "react-router-dom";
@@ -69,7 +70,7 @@ export default function AppPanel({ isDrawer = false }: Props) {
               size="icon-sm"
               onClick={handleCloseAppPanel}
             >
-              <SidebarClose />
+              <X/>
             </Button>
           </div>
         ) : null}
