@@ -8,7 +8,12 @@ export default function ToggleThemeButton() {
     setTheme(theme === "dark" ? "light" : "dark");
   }
   return (
-    <Button size="icon-lg" onClick={handleThemeToggle}>
+    <Button
+      variant="ghost"
+      size="icon-lg"
+      onClick={handleThemeToggle}
+      className="text-muted-foreground"
+    >
       {theme === "dark" ? <Sun /> : <Moon />}
     </Button>
   );

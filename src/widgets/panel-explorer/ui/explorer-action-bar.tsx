@@ -67,7 +67,7 @@ export default function ExplorerActionBar({
             }
             disabled={isLoading}
           >
-            <Edit className="size-5 text-muted-foreground" />
+            <Edit  />
           </Button>
         </Tooltip>
         <Tooltip content="add folder" side="bottom">
@@ -79,7 +79,7 @@ export default function ExplorerActionBar({
             }
             disabled={isLoading}
           >
-            <FolderPlus className="size-5 text-muted-foreground" />
+            <FolderPlus/>
           </Button>
         </Tooltip>
         <SortActionMenu sortBy={sortBy} onSortByChange={handleChangeSort} />
@@ -90,9 +90,9 @@ export default function ExplorerActionBar({
             onClick={handleToggleFoldersCollapse}
           >
             {allFoldersCollapsed ? (
-              <ChevronsDownUpIcon className="size-5 text-muted-foreground" />
+              <ChevronsDownUpIcon/>
             ) : (
-              <ChevronsUpDown className="size-5 text-muted-foreground" />
+              <ChevronsUpDown/>
             )}
           </Button>
         </Tooltip>

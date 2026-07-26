@@ -30,16 +30,20 @@ export default function AppPanel() {
 
   return (
     <div className="h-full flex flex-col bg-sidebar">
-      <div className="flex items-center gap-3 bg-card px-5 py-2">
+      <div className="flex items-center gap-1.5 bg-popover px-5 py-1">
         {panelItems.map((item) => (
           <Tooltip key={item.title} content={item.title} side="bottom">
-            <Button size="icon-lg" onClick={() => navigate(item.href)}>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => navigate(item.href)}
+              className="text-muted-foreground"
+            >
               <item.icon />
             </Button>
           </Tooltip>
         ))}
       </div>
-      <Separator />
       <div className="flex-1 min-h-0">
         {panel === "explorer" ? (
           <PanelExplorer />

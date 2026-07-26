@@ -9,7 +9,7 @@ export default function EditorArea() {
   const activeNoteId = useAppSelector(selectActiveNoteId);
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="bg-card w-full px-4 py-3">
+      <div className="w-full">
         <TabsSection />
       </div>
       <div className="flex-1 flex flex-col">
