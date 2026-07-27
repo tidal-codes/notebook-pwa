@@ -15,6 +15,7 @@ import {
 import { selectIsAppSidebarOpen } from "@/shared/model/app-ui.selectors";
 import { useCallback, useEffect, useRef } from "react";
 import { closeAppSidebar, openAppSidebar } from "@/shared/model/app-ui.store";
+import EditorCanvas from "@/widgets/editor-canvas";
 
 export default function MainPanel() {
   const isDesktop = useBreakpointValue({ base: false, md: true });
@@ -83,7 +84,9 @@ export default function MainPanel() {
       </ResizablePanel>
       <ResizableHandle className="ring-primary data-[separator='hover']:ring-2 data-[separator='active']:ring-2" />
       <ResizablePanel id="editor_area">
-        <EditorArea />
+        <EditorArea>
+          <EditorCanvas />
+        </EditorArea>
       </ResizablePanel>
     </ResizablePanelGroup>
   );

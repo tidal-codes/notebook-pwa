@@ -6,7 +6,6 @@ import { selectActiveNoteId } from "@/entities/tabs/model/selectors";
 import NewTabScreen from "./new-tab-screen";
 import type { PropsWithChildren } from "react";
 
-
 export default function EditorArea({ children }: PropsWithChildren) {
   const activeNoteId = useAppSelector(selectActiveNoteId);
   return (
@@ -15,15 +14,15 @@ export default function EditorArea({ children }: PropsWithChildren) {
         <TabsSection />
       </div>
       <div className="flex-1 flex flex-col">
-        <div>
-          <TabControllerSection noteId={activeNoteId} />
+        <TabControllerSection noteId={activeNoteId} />
+        <div className="mx-auto w-full max-w-3xl  py-3">
           {activeNoteId && <NoteTitle noteId={activeNoteId} />}
+          {activeNoteId ? (
+            <div className="flex-1">{children}</div>
+          ) : (
+            <NewTabScreen />
+          )}
         </div>
-        {activeNoteId ? (
-          <div className="flex-1">{children}</div>
-        ) : (
-          <NewTabScreen />
-        )}
       </div>
     </div>
   );
