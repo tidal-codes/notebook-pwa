@@ -23,7 +23,6 @@ export default function MainPanel() {
   const isSidebarOpen = useAppSelector(selectIsAppSidebarOpen);
   const appPanelRef = useRef<PanelImperativeHandle>(null);
 
-  // جلوگیری از رفت‌وبرگشت بی‌نهایت بین تغییر امپریتیو پنل و dispatch ردیوکس
   const isSyncingRef = useRef(false);
 
   const handleLayoutChanged = useCallback(
@@ -60,7 +59,15 @@ export default function MainPanel() {
       <>
         <PanelDrawer />
         <div className="w-full flex flex-1">
-          <EditorArea />
+          <EditorArea>
+            {(note, onSave) => (
+              <EditorCanvas
+                noteId={note.id}
+                noteContent={note.content}
+                onSave={onSave}
+              />
+            )}
+          </EditorArea>
         </div>
       </>
     );
@@ -85,7 +92,13 @@ export default function MainPanel() {
       <ResizableHandle className="ring-primary data-[separator='hover']:ring-2 data-[separator='active']:ring-2" />
       <ResizablePanel id="editor_area">
         <EditorArea>
-          <EditorCanvas />
+          {(note, onSave) => (
+            <EditorCanvas
+              noteId={note.id}
+              noteContent={note.content}
+              onSave={onSave}
+            />
+          )}
         </EditorArea>
       </ResizablePanel>
     </ResizablePanelGroup>

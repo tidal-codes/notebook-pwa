@@ -4,21 +4,49 @@ import TabControllerSection from "./tab-controller-section";
 import TabsSection from "./tabs-section";
 import { selectActiveNoteId } from "@/entities/tabs/model/selectors";
 import NewTabScreen from "./new-tab-screen";
-import type { PropsWithChildren } from "react";
+import { useCallback, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { notesQueryOptions } from "@/entities/note/api/note.queries";
+import type { NoteEntity } from "@/entities/note/model/types";
+import { useUpdateNote } from "@/entities/note/api/note.mutations";
+import type { JSONContent } from "@tiptap/react";
 
-export default function EditorArea({ children }: PropsWithChildren) {
+export default function EditorArea({
+  children,
+}: {
+  children: (
+    note: NoteEntity,
+    handleSaveNoteContent: (id: string, content: JSONContent) => void,
+  ) => ReactNode;
+}) {
   const activeNoteId = useAppSelector(selectActiveNoteId);
+  const { mutate } = useUpdateNote();
+  const { data: note } = useQuery({
+    ...notesQueryOptions,
+    select: (data) => data.find((note) => note.id === activeNoteId),
+  });
+
+  const handleSaveNoteContent = useCallback(
+    (id: string, content: JSONContent) => {
+      console.log("save called on this id:", id);
+      mutate({ id, data: { content } });
+    },
+    [mutate],
+  );
+
   return (
     <div className="w-full h-full flex flex-col">
       <div className="w-full">
         <TabsSection />
       </div>
       <div className="flex-1 flex flex-col">
-        <TabControllerSection noteId={activeNoteId} />
+        <TabControllerSection noteTitle={note?.name} />
         <div className="mx-auto w-full max-w-3xl  py-3">
-          {activeNoteId && <NoteTitle noteId={activeNoteId} />}
-          {activeNoteId ? (
-            <div className="flex-1">{children}</div>
+          {note && <NoteTitle note={note} />}
+          {note ? (
+            <div className="flex-1">
+              {children(note, handleSaveNoteContent)}
+            </div>
           ) : (
             <NewTabScreen />
           )}

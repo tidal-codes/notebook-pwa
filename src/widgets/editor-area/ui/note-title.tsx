@@ -1,28 +1,22 @@
-import { notesQueryOptions } from "@/entities/note/api/note.queries";
+import type { NoteEntity } from "@/entities/note/model/types";
 import useRenameEntity from "@/features/entity/rename-entity/use-rename-entity";
 import { Input } from "@/shared/ui/input";
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Props {
-  noteId: string;
+  note: NoteEntity;
 }
 
-export default function NoteTitle({ noteId }: Props) {
-  const { data: note } = useQuery({
-    ...notesQueryOptions,
-    select: (data) => data.find((note) => note.id === noteId),
-  });
-
+export default function NoteTitle({ note }: Props) {
   const [draftTitle, setDraftTitle] = useState(note?.name ?? "");
-  const { renameEntity } = useRenameEntity(noteId, "note");
+  const { renameEntity } = useRenameEntity(note.id, "note");
 
   const isFinalizedRef = useRef(false);
 
   useEffect(() => {
     setDraftTitle(note?.name ?? "");
     isFinalizedRef.current = false;
-  }, [noteId, note?.name]);
+  }, [note.id, note?.name]);
 
   const commitRename = useCallback(() => {
     if (isFinalizedRef.current || !note) return;
@@ -56,7 +50,7 @@ export default function NoteTitle({ noteId }: Props) {
 
       if (e.key === "Escape") {
         e.preventDefault();
-        isFinalizedRef.current = true; 
+        isFinalizedRef.current = true;
         setDraftTitle(note?.name ?? "");
         e.currentTarget.blur();
       }

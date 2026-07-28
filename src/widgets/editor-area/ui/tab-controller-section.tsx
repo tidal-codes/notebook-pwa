@@ -4,16 +4,15 @@ import TabControllerSectionTitle from "./tab-controller-section-title";
 import TabControllerSectionHistory from "./tab-controller-section-history";
 
 interface Props {
-  noteId: string | null;
+  noteTitle: string | undefined;
 }
 
-export default function TabControllerSection({ noteId }: Props) {
-
+export default function TabControllerSection({ noteTitle }: Props) {
   return (
     <div className="w-full flex items-center justify-between py-3 px-5">
       <TabControllerSectionHistory />
       <div>
-        <TabControllerSectionTitle noteId={noteId} />
+        <TabControllerSectionTitle noteTitle={noteTitle} />
       </div>
       <div>
         <Button size="icon-sm" variant="ghost">

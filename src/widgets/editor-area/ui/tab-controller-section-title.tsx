@@ -1,15 +1,8 @@
-import { notesQueryOptions } from "@/entities/note/api/note.queries";
-import { useQuery } from "@tanstack/react-query";
-
 interface Props {
-  noteId: string | null;
+  noteTitle: string | undefined;
 }
-export default function TabControllerSectionTitle({ noteId }: Props) {
-  const { data: note } = useQuery({
-    ...notesQueryOptions,
-    enabled: !!noteId,
-    select: (data) => data.find((note) => note.id === noteId),
-  });
-
-  return <p className="text-xs text-muted-foreground">{note?.name || "new tab"}</p>;
+export default function TabControllerSectionTitle({ noteTitle }: Props) {
+  return (
+    <p className="text-xs text-muted-foreground">{noteTitle || "new tab"}</p>
+  );
 }
