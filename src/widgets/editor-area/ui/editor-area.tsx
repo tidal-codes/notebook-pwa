@@ -10,6 +10,7 @@ import { notesQueryOptions } from "@/entities/note/api/note.queries";
 import type { NoteEntity } from "@/entities/note/model/types";
 import { useUpdateNote } from "@/entities/note/api/note.mutations";
 import type { JSONContent } from "@tiptap/react";
+import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
 
 export default function EditorArea({
   children,
@@ -39,18 +40,21 @@ export default function EditorArea({
       <div className="w-full">
         <TabsSection />
       </div>
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         <TabControllerSection noteTitle={note?.name} />
-        <div className="mx-auto w-full max-w-3xl  py-3">
-          {note && <NoteTitle note={note} />}
-          {note ? (
-            <div className="flex-1">
-              {children(note, handleSaveNoteContent)}
-            </div>
-          ) : (
-            <NewTabScreen />
-          )}
-        </div>
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="mx-auto w-full max-w-3xl py-3">
+            {note && <NoteTitle note={note} />}
+            {note ? (
+              <div className="flex-1">
+                {children(note, handleSaveNoteContent)}
+              </div>
+            ) : (
+              <NewTabScreen />
+            )}
+          </div>
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
       </div>
     </div>
   );

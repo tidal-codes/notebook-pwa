@@ -16,6 +16,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
 import { Popover, PopoverTrigger, PopoverContent } from "@/shared/ui/popover";
+import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
 import { cn } from "@/shared/lib/utils";
 
 const TEXT_TYPES = [
@@ -105,173 +106,191 @@ export function SelectionToolbar({ editor }: { editor: Editor }) {
         const { from, to } = state.selection;
         return from !== to && !ed.isActive("codeBlock");
       }}
+      className="z-1000"
     >
-      <div className="flex items-center gap-0.5 rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-2xl">
-        <Popover open={textTypeOpen} onOpenChange={setTextTypeOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="toolbar" size="default" className="gap-1 px-2.5">
-              <span>{activeTextType}</span>
-              <ChevronDown className="h-3.5 w-3.5 opacity-70" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="start" className="w-44 p-1">
-            <div className="flex flex-col gap-0.5">
-              {TEXT_TYPES.map((t) => {
-                const active = t.isActive(editor);
-                return (
+      <div className="max-w-[calc(100vw-2rem)] rounded-lg border border-border bg-background shadow-2xl">
+        <ScrollArea className="w-full">
+          <div className="flex w-max items-center gap-0.5 p-1">
+            <Popover open={textTypeOpen} onOpenChange={setTextTypeOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="default"
+                  className="gap-1 px-2.5 hover:bg-item-hover"
+                >
+                  <span>{activeTextType}</span>
+                  <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                className="w-44 bg-background border p-1"
+                sideOffset={10}
+              >
+                <div className="flex flex-col gap-0.5">
+                  {TEXT_TYPES.map((t) => {
+                    const active = t.isActive(editor);
+                    return (
+                      <button
+                        key={t.label}
+                        onClick={() => {
+                          t.action(editor);
+                          setTextTypeOpen(false);
+                        }}
+                        className={cn(
+                          "flex items-center justify-between rounded-md px-2 py-1.5 text-left text-sm hover:bg-item-hover",
+                          active && "bg-accent/15 text-foreground",
+                        )}
+                      >
+                        <span>{t.label}</span>
+                        {active && <Check className="h-3.5 w-3.5 opacity-70" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <Separator orientation="vertical" />
+
+            <Popover open={linkOpen} onOpenChange={setLinkOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={editor.isActive("link") ? "default" : "ghost"}
+                  size="default"
+                  className="gap-1.5 px-2.5 hover:bg-item-hover"
+                  onClick={() =>
+                    setLinkValue(editor.getAttributes("link").href ?? "")
+                  }
+                >
+                  <Link2 className="h-4 w-4" />
+                  <span>Link</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                className="w-72 bg-background p-2"
+                sideOffset={10}
+              >
+                <form
+                  className="flex items-center gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    applyLink();
+                  }}
+                >
+                  <input
+                    autoFocus
+                    value={linkValue}
+                    onChange={(e) => setLinkValue(e.target.value)}
+                    placeholder="https://example.com"
+                    className="h-8 flex-1 rounded-md border border-border bg-background px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  />
+                  <Button type="submit" size="default" className="h-8 px-3 text-sm">
+                    Save
+                  </Button>
+                </form>
+              </PopoverContent>
+            </Popover>
+
+            <Separator orientation="vertical" />
+
+            <Popover open={colorOpen} onOpenChange={setColorOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="default"
+                  className="gap-0.5 px-2.5 font-semibold hover:bg-item-hover"
+                >
+                  Color <span className="text-xs opacity-70">AA</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="start"
+                className="flex w-auto flex-row gap-1 bg-background p-1.5"
+                sideOffset={10}
+              >
+                {COLORS.map((c) => (
                   <button
-                    key={t.label}
+                    key={c.label}
+                    title={c.label}
                     onClick={() => {
-                      t.action(editor);
-                      setTextTypeOpen(false);
+                      c.value
+                        ? editor.chain().focus().setColor(c.value).run()
+                        : editor.chain().focus().unsetColor().run();
+                      setColorOpen(false);
                     }}
-                    className={cn(
-                      "flex items-center justify-between rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent/15",
-                      active && "bg-accent/15 text-foreground",
-                    )}
-                  >
-                    <span>{t.label}</span>
-                    {active && <Check className="h-3.5 w-3.5 opacity-70" />}
-                  </button>
-                );
-              })}
-            </div>
-          </PopoverContent>
-        </Popover>
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-border hover:bg-item-hover"
+                    style={{ backgroundColor: c.value ?? "transparent" }}
+                  />
+                ))}
+              </PopoverContent>
+            </Popover>
 
-        <Separator orientation="vertical" />
+            <Separator orientation="vertical" />
 
-        <Popover open={linkOpen} onOpenChange={setLinkOpen}>
-          <PopoverTrigger asChild>
             <Button
-              variant="toolbar"
-              size="default"
-              className="gap-1.5 px-2.5"
-              data-active={editor.isActive("link")}
-              onClick={() =>
-                setLinkValue(editor.getAttributes("link").href ?? "")
-              }
+              variant={editor.isActive("bold") ? "default" : "ghost"}
+              size="icon"
+              className="hover:bg-item-hover"
+              onClick={() => editor.chain().focus().toggleBold().run()}
             >
-              <Link2 className="h-4 w-4" />
-              <span>Link</span>
+              <Bold className="h-4 w-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent align="start" className="w-72 p-2">
-            <form
-              className="flex items-center gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                applyLink();
-              }}
-            >
-              <input
-                autoFocus
-                value={linkValue}
-                onChange={(e) => setLinkValue(e.target.value)}
-                placeholder="https://example.com"
-                className="h-8 flex-1 rounded-md border border-border bg-background px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              />
-              <Button type="submit" size="default" className="h-8 px-3 text-sm">
-                Save
-              </Button>
-            </form>
-          </PopoverContent>
-        </Popover>
-
-        <Separator orientation="vertical" />
-
-        <Popover open={colorOpen} onOpenChange={setColorOpen}>
-          <PopoverTrigger asChild>
             <Button
-              variant="toolbar"
-              size="default"
-              className="gap-0.5 px-2.5 font-semibold"
+              variant={editor.isActive("italic") ? "default" : "ghost"}
+              size="icon"
+              className="hover:bg-item-hover"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
             >
-              Color <span className="text-xs opacity-70">AA</span>
+              <Italic className="h-4 w-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="flex flex-row gap-1 p-1.5 w-auto"
-          >
-            {COLORS.map((c) => (
-              <button
-                key={c.label}
-                title={c.label}
-                onClick={() => {
-                  c.value
-                    ? editor.chain().focus().setColor(c.value).run()
-                    : editor.chain().focus().unsetColor().run();
-                  setColorOpen(false);
-                }}
-                className="flex h-6 w-6 items-center justify-center rounded-full border border-border"
-                style={{ backgroundColor: c.value ?? "transparent" }}
-              />
-            ))}
-          </PopoverContent>
-        </Popover>
+            <Button
+              variant={editor.isActive("underline") ? "default" : "ghost"}
+              size="icon"
+              className="hover:bg-item-hover"
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+            >
+              <Underline className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={editor.isActive("strike") ? "default" : "ghost"}
+              size="icon"
+              className="hover:bg-item-hover"
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+            >
+              <Strikethrough className="h-4 w-4" />
+            </Button>
 
-        <Separator orientation="vertical" />
+            <Separator orientation="vertical" />
 
-        <Button
-          variant="toolbar"
-          size="icon"
-          data-active={editor.isActive("bold")}
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="toolbar"
-          size="icon"
-          data-active={editor.isActive("italic")}
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="toolbar"
-          size="icon"
-          data-active={editor.isActive("underline")}
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-        >
-          <Underline className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="toolbar"
-          size="icon"
-          data-active={editor.isActive("strike")}
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-        >
-          <Strikethrough className="h-4 w-4" />
-        </Button>
-
-        <Separator orientation="vertical" />
-
-        <Button
-          variant="toolbar"
-          size="icon"
-          data-active={editor.isActive({ textAlign: "left" })}
-          onClick={() => editor.chain().focus().setTextAlign("left").run()}
-        >
-          <AlignLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="toolbar"
-          size="icon"
-          data-active={editor.isActive({ textAlign: "center" })}
-          onClick={() => editor.chain().focus().setTextAlign("center").run()}
-        >
-          <AlignCenter className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="toolbar"
-          size="icon"
-          data-active={editor.isActive({ textAlign: "right" })}
-          onClick={() => editor.chain().focus().setTextAlign("right").run()}
-        >
-          <AlignRight className="h-4 w-4" />
-        </Button>
+            <Button
+              variant={editor.isActive({ textAlign: "left" }) ? "default" : "ghost"}
+              size="icon"
+              className="hover:bg-item-hover"
+              onClick={() => editor.chain().focus().setTextAlign("left").run()}
+            >
+              <AlignLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={editor.isActive({ textAlign: "center" }) ? "default" : "ghost"}
+              size="icon"
+              className="hover:bg-item-hover"
+              onClick={() => editor.chain().focus().setTextAlign("center").run()}
+            >
+              <AlignCenter className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={editor.isActive({ textAlign: "right" }) ? "default" : "ghost"}
+              size="icon"
+              className="hover:bg-item-hover"
+              onClick={() => editor.chain().focus().setTextAlign("right").run()}
+            >
+              <AlignRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <ScrollBar orientation="horizontal" className="h-1.5" />
+        </ScrollArea>
       </div>
     </BubbleMenu>
   );
