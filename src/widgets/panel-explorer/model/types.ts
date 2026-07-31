@@ -37,7 +37,6 @@ export interface ExplorerType {
 export type CommonMenuItemIds =
   | "MAKE_COPY"
   | "MOVE_TO"
-  | "BOOKMARK"
   | "RENAME"
   | "DELETE";
 

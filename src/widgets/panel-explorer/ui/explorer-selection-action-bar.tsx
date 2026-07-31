@@ -1,21 +1,18 @@
 import { useConfirmDeleteDialogActions } from "@/features/entity/delete-entity/confirm-delete-dialog-provider";
-import useDeleteEntities from "@/features/entity/delete-entity/use-delete-entity";
 import type { MenuEntry } from "@/shared/model/types";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import DropdownMenu from "@/shared/ui/dropdown-menu";
 import { Separator } from "@/shared/ui/separator";
 import {
-  Bookmark,
   EllipsisVerticalIcon,
   FolderPlus,
   FolderTree,
   Trash2,
   XCircle,
 } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import {
-  selectSelectedEntities,
   selectSelectedEntitiesList,
   selectSemiSelectedItem,
 } from "../model/explorer.selectors";
@@ -30,7 +27,6 @@ interface Props {
 type SelectionActionIds =
   | "NEW_FOLDER_WITH_SELECTION"
   | "MOVE_ITEMS"
-  | "BOOKMARK"
   | "DELETE";
 
 export default function ExplorerSelectionActionBar({
@@ -59,12 +55,6 @@ export default function ExplorerSelectionActionBar({
         id: "MOVE_ITEMS",
         label: `move ${selectedCount} items to...`,
         icon: <FolderTree />,
-      },
-      {
-        type: "item",
-        id: "BOOKMARK",
-        label: `bookmark...`,
-        icon: <Bookmark />,
       },
       { type: "separator" },
       {

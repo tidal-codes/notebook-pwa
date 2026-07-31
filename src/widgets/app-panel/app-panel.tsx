@@ -1,15 +1,7 @@
-import { Separator } from "@/shared/ui/separator";
 import PanelExplorer from "../panel-explorer";
 import useAppPanel from "./use-app-panel";
 import { Button } from "@/shared/ui/button";
-import {
-  Bookmark,
-  CircleX,
-  FolderClosed,
-  Search,
-  SidebarClose,
-  X,
-} from "lucide-react";
+import { FolderClosed, Search, X } from "lucide-react";
 import Tooltip from "@/shared/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@/shared/config/store/hooks";
@@ -17,7 +9,7 @@ import { closeAppDrawer } from "@/shared/model/app-ui.store";
 
 const panelItems = [
   {
-    title: "files",
+    title: "explorer",
     href: "/explorer",
     icon: FolderClosed,
   },
@@ -25,11 +17,6 @@ const panelItems = [
     title: "search",
     href: "/search",
     icon: Search,
-  },
-  {
-    title: "bookmarks",
-    href: "/bookmarks",
-    icon: Bookmark,
   },
 ];
 
@@ -70,15 +57,13 @@ export default function AppPanel({ isDrawer = false }: Props) {
               size="icon-sm"
               onClick={handleCloseAppPanel}
             >
-              <X/>
+              <X />
             </Button>
           </div>
         ) : null}
       </div>
       <div className="flex-1 min-h-0">
-        {panel === "explorer" ? (
-          <PanelExplorer />
-        ) : panel === "bookmarks" ? null : null}
+        {panel === "explorer" ? <PanelExplorer /> : null}
       </div>
     </div>
   );

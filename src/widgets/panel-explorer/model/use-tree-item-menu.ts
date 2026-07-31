@@ -79,12 +79,6 @@ export function useTreeItemMenu<T extends string>(
             },
           });
           break;
-
-        case "BOOKMARK":
-          // TODO
-          // dispatch(toggleBookmark(id))
-          break;
-
         case "RENAME":
           dispatch(startRenaming(id));
           break;

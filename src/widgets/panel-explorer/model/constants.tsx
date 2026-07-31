@@ -3,7 +3,6 @@ import {
   FilePlus,
   BookCopy,
   FolderTree,
-  Bookmark,
   CircleCheck,
   Edit3,
   Trash2,
@@ -33,12 +32,6 @@ export const NOTE_MENU_ITEMS: MenuEntry<NoteMenuItemIds>[] = [
     id: "MOVE_TO",
     label: "move file to ...",
     icon: <FolderTree />,
-  },
-  {
-    type: "item",
-    id: "BOOKMARK",
-    label: "bookmark",
-    icon: <Bookmark />,
   },
   {
     type: "item",
@@ -97,12 +90,6 @@ export const FOLDER_MENU_ITEMS: MenuEntry<FolderMenuItemIds>[] = [
     id: "MOVE_TO",
     label: "move file to ...",
     icon: <FolderTree />,
-  },
-  {
-    type: "item",
-    id: "BOOKMARK",
-    label: "bookmark",
-    icon: <Bookmark />,
   },
   {
     type: "separator",
