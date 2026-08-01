@@ -74,6 +74,9 @@ importers:
       dexie:
         specifier: ^4.4.4
         version: 4.4.4
+      flexsearch:
+        specifier: ^0.8.212
+        version: 0.8.212
       lucide-react:
         specifier: ^1.23.0
         version: 1.23.0(react@19.2.7)
@@ -2191,6 +2194,9 @@ packages:
 
   flatted@3.4.2:
     resolution: {integrity: sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==}
+
+  flexsearch@0.8.212:
+    resolution: {integrity: sha512-wSyJr1GUWoOOIISRu+X2IXiOcVfg9qqBRyCPRUdLMIGJqPzMo+jMRlvE83t14v1j0dRMEaBbER/adQjp6Du2pw==}
 
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -5504,6 +5510,8 @@ snapshots:
       keyv: 4.5.4
 
   flatted@3.4.2: {}
+
+  flexsearch@0.8.212: {}
 
   forwarded@0.2.0: {}
 

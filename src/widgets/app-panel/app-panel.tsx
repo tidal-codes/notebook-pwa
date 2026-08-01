@@ -6,6 +6,7 @@ import Tooltip from "@/shared/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@/shared/config/store/hooks";
 import { closeAppDrawer } from "@/shared/model/app-ui.store";
+import SearchPanel from "../search-panel";
 
 const panelItems = [
   {
@@ -63,7 +64,7 @@ export default function AppPanel({ isDrawer = false }: Props) {
         ) : null}
       </div>
       <div className="flex-1 min-h-0">
-        {panel === "explorer" ? <PanelExplorer /> : null}
+        {panel === "explorer" ? <PanelExplorer /> : <SearchPanel />}
       </div>
     </div>
   );
