@@ -11,6 +11,7 @@ import type { NoteEntity } from "@/entities/note/model/types";
 import { useUpdateNote } from "@/entities/note/api/note.mutations";
 import type { JSONContent } from "@tiptap/react";
 import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
+import { getSearchIndexManager } from "@/features/search/global-search/model/search-index-manager";
 
 export default function EditorArea({
   children,
@@ -31,6 +32,11 @@ export default function EditorArea({
     (id: string, content: JSONContent) => {
       console.log("save called on this id:", id);
       mutate({ id, data: { content } });
+      getSearchIndexManager()
+        .notifyNoteChanged({ id, content })
+        .catch((error) =>
+          console.error("Failed to update search index", error),
+        );
     },
     [mutate],
   );

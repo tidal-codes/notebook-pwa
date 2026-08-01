@@ -1,13 +1,11 @@
-import type { NoteEntity } from "@/entities/note/model/types";
-
 
 /** One exact occurrence of the search term inside a single note. */
 export interface SearchMatch {
-  /** Stable id for React keys: `${noteId}-${start}`. */
+  /** Stable id for React keys: `${noteId}-${source}-${start}`. */
   matchId: string;
-  /** Character offset of the match start, inside the note's plain text. */
+  /** Character offset of the match start, inside the source text (title or plain content). */
   start: number;
-  /** Character offset of the match end (exclusive), inside the plain text. */
+  /** Character offset of the match end (exclusive), inside the source text. */
   end: number;
   /** ~50 chars of context before + the match + ~50 chars after. */
   preview: string;
@@ -15,6 +13,8 @@ export interface SearchMatch {
   previewMatchStart: number;
   /** Where the match ends inside `preview`. */
   previewMatchEnd: number;
+  /** Whether this occurrence was found in the note's title or its content. */
+  source: "title" | "content";
 }
 
 /** All matches found inside one note, grouped together. */
@@ -48,9 +48,25 @@ export interface NoteContentEntry {
 /** Response of the content worker's `init` call: every note, pre-extracted. */
 export type InitContentResponse = NoteContentEntry[];
 
-/** Sent to the content worker after a note is created or edited. */
+/**
+ * What a mutation hook actually has on hand at the moment it fires - NOT
+ * a full `NoteRecord`. Only `id` is required; supply whichever of
+ * `title`/`content`/`updatedAt` actually changed. Whatever you omit, the
+ * content worker keeps using its own cached value for that field (e.g. a
+ * rename only needs to send `{ id, title }` - the cached content is left
+ * untouched).
+ */
+export interface NotePartialChange {
+  id: string;
+  title?: string;
+  /** Tiptap/ProseMirror JSON (object or JSON string) - only if content changed. */
+  content?: unknown;
+  updatedAt?: number;
+}
+
+/** Sent to the content worker after a note is created, renamed, or its content edited. */
 export interface NoteChangedPayload {
-  note: NoteEntity;
+  change: NotePartialChange;
 }
 
 /** Sent to the content worker after a note is deleted. */
@@ -58,6 +74,12 @@ export interface NoteDeletedPayload {
   noteId: string;
 }
 
+/**
+ * Sent to the content worker AFTER FlexSearch (on the main thread) has
+ * already narrowed the field down to `noteIds` — the content worker then
+ * does the exact, matchCase-aware regex scan ONLY on those notes and builds
+ * the previews.
+ */
 export interface ScanMatchesPayload {
   noteIds: string[];
   query: string;

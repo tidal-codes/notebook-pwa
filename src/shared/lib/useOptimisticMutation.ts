@@ -8,7 +8,7 @@ interface UseOptimisticMutationOptions<TMutateFnData, TData, TVariables> {
     onSuccessUpdater?: (data: TMutateFnData, variables: TVariables, oldData: TData | undefined) => TData;
     onSettledInvalidate?: boolean;
     onError?: () => void;
-    onSuccess?: () => void;
+    onSuccess?: (data: TMutateFnData, variables: TVariables) => void;
 }
 
 export function useOptimisticMutation<TMutateFnData, TData, TVariables = unknown>({
@@ -50,7 +50,7 @@ export function useOptimisticMutation<TMutateFnData, TData, TVariables = unknown
                     return onSuccessUpdater(data, variables, old);
                 });
             }
-            onSuccess?.();
+            onSuccess?.(data , variables);
         },
         onSettled: () => {
             if (onSettledInvalidate) {

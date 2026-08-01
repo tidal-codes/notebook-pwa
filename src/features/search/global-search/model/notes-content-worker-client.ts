@@ -1,19 +1,17 @@
-
-
 import { createWorkerRpcClient } from "@/shared/lib/create-worker-rpc";
 import type {
   InitContentResponse,
   NoteChangedPayload,
   NoteContentEntry,
   NoteDeletedPayload,
+  NotePartialChange,
   ScanMatchesPayload,
   ScanMatchesResponse,
 } from "./types";
-import type { NoteEntity } from "@/entities/note/model/types";
 
 export interface NotesContentWorkerClient {
   init: () => Promise<InitContentResponse>;
-  notifyNoteChanged: (note: NoteEntity) => Promise<NoteContentEntry>;
+  notifyNoteChanged: (change: NotePartialChange) => Promise<NoteContentEntry>;
   notifyNoteDeleted: (noteId: string) => Promise<void>;
   scanMatches: (
     noteIds: string[],
@@ -36,8 +34,8 @@ export function createNotesContentWorkerClient(): NotesContentWorkerClient {
   return {
     init: () => rpc.call<undefined, InitContentResponse>("init"),
 
-    notifyNoteChanged: (note) =>
-      rpc.call<NoteChangedPayload, NoteContentEntry>("noteChanged", { note }),
+    notifyNoteChanged: (change) =>
+      rpc.call<NoteChangedPayload, NoteContentEntry>("noteChanged", { change }),
 
     notifyNoteDeleted: (noteId) =>
       rpc.call<NoteDeletedPayload, void>("noteDeleted", { noteId }),

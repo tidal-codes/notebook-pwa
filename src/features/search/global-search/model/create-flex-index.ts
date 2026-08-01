@@ -12,11 +12,11 @@ export async function createFlexIndex() {
     document: {
       id: "id",
       index: [
-        { field: "title", tokenize: "forward" },
-        { field: "content", tokenize: "forward" },
+        { field: "title", tokenize: "full" },
+        { field: "content", tokenize: "full" },
       ],
     },
-    tokenize: "forward",
+    tokenize: "full",
     context: true,
   });
 

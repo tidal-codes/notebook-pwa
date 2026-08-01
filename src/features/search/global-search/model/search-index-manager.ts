@@ -1,8 +1,7 @@
 import { createNotesContentWorkerClient } from "./notes-content-worker-client";
 import { createFlexIndex, type FlexIndex } from "./create-flex-index";
 import { dedupeCandidateIds } from "../lib/dedupe-candidate-ids";
-import type { SearchResponsePayload } from "./types";
-import type { NoteEntity } from "@/entities/note/model/types";
+import type { NotePartialChange, SearchResponsePayload } from "./types";
 
 export interface SearchIndexManager {
   /** Idempotent - safe to call multiple times; only does real work once. */
@@ -12,7 +11,7 @@ export interface SearchIndexManager {
     matchCase: boolean,
     limit?: number,
   ) => Promise<SearchResponsePayload>;
-  notifyNoteChanged: (note: NoteEntity) => Promise<void>;
+  notifyNoteChanged: (change: NotePartialChange) => Promise<void>;
   notifyNoteDeleted: (noteId: string) => Promise<void>;
   terminate: () => void;
 }
@@ -66,9 +65,6 @@ export function createSearchIndexManager(): SearchIndexManager {
       limit,
       enrich: false,
     });
-
-    console.log("IS RUNNINGGGGGGGGGGGGGGGGGGGGGGGGG")
-    
     const candidateNoteIds = dedupeCandidateIds(fieldResults as any);
 
     if (candidateNoteIds.length === 0) {
@@ -86,9 +82,9 @@ export function createSearchIndexManager(): SearchIndexManager {
     return { query, results, totalMatches };
   }
 
-  async function notifyNoteChanged(note: NoteEntity): Promise<void> {
+  async function notifyNoteChanged(change: NotePartialChange): Promise<void> {
     await ensureReady();
-    const entry = await contentClient.notifyNoteChanged(note);
+    const entry = await contentClient.notifyNoteChanged(change);
     await flexIndex?.update({
       id: entry.id,
       title: entry.title,

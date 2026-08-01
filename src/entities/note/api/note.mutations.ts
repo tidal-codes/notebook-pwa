@@ -3,20 +3,24 @@ import { NOTES_KEY } from "./query.keys";
 import { updateNote, deleteNote, createNote } from ".";
 import type { NoteEntity } from "../model/types";
 
-export function useUpdateNote(onError?: () => void , onSuccess?: () => void) {
+export function useUpdateNote(
+  onError?: () => void,
+  onSuccess?: (variables?: { id: string; data: Partial<NoteEntity> }) => void,
+) {
   return useOptimisticMutation({
     mutationKey: ["update_note"],
     queryKey: NOTES_KEY,
     mutationFn: ({ id, data }: { id: string; data: Partial<NoteEntity> }) =>
       updateNote(id, data),
     optimisticUpdater(variables, oldData: NoteEntity[]) {
-      console.log(variables)
       return oldData.map((note) =>
         note.id === variables.id ? { ...note, ...variables.data } : note,
       );
     },
     onError,
-    onSuccess
+    onSuccess: (_, variables) => {
+      onSuccess?.(variables);
+    },
   });
 }
 
