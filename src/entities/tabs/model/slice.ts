@@ -40,6 +40,16 @@ function getActiveTab(state: TabsState): Tab {
   return findTab(state, state.activeTabId)!;
 }
 
+/**
+ * نوت رو توی تب باز/اکتیو می‌کنه.
+ * منطق:
+ * 1) اگه همون نوت الان اکتیوه -> هیچ کاری نکن.
+ * 2) اگه تب کاملاً خالیه (یه entry تک با noteId=null) -> همون entry رو با نوت جدید جایگزین کن.
+ * 3) اگه نوت از قبل جای دیگه‌ای توی همین تب باز بوده (نه لزوماً entry فعال) ->
+ *    اون entry رو از جای فعلیش بردار و ببرش ته آرایه (یعنی جدیدترین/فعال) و اکتیوش کن.
+ *    این باعث میشه دیگه duplicate ساخته نشه و ترتیب entries به‌روز بمونه.
+ * 4) در غیر این صورت -> تاریخچه‌ی جلوتر از entry فعال رو کات کن و entry جدید رو push کن.
+ */
 function pushNoteToTab(tab: Tab, noteId: string) {
   const currentEntry = tab.entries[tab.activeEntryIndex];
 
@@ -51,6 +61,15 @@ function pushNoteToTab(tab: Tab, noteId: string) {
   if (isBlankNewTab) {
     tab.entries[0] = createNoteEntry(noteId);
     tab.activeEntryIndex = 0;
+    return;
+  }
+
+  const existingIndex = tab.entries.findIndex((e) => e.noteId === noteId);
+
+  if (existingIndex !== -1) {
+    const [existingEntry] = tab.entries.splice(existingIndex, 1);
+    tab.entries.push(existingEntry);
+    tab.activeEntryIndex = tab.entries.length - 1;
     return;
   }
 

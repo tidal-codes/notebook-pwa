@@ -14,7 +14,7 @@ export default function SearchResultControl({ searchResults }: Props) {
   return (
     <>
       <div className="w-full flex items-center">
-        <p className="text-xs text-muted-foreground">{totalMatches} results</p>
+        <p className="text-xs text-muted-foreground">{totalMatches} results found</p>
       </div>
       <Separator className="mt-4"/>
     </>

@@ -18,6 +18,18 @@ import { SelectionToolbar } from "@/features/editor/selection-toolbar";
 import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 
+// --- اضافه شد -----------------------------------------------------------
+import {
+  SearchHighlightExtension,
+  useInNoteSearch,
+  // InNoteSearchToolbar,
+} from "@/features/search/in-note-search";
+import {
+  SpotlightExtension,
+  useNoteSpotlight,
+} from "@/features/search/note-spotlight";
+// --------------------------------------------------------------------------
+
 const extensions: Extensions = [
   StarterKit,
   Underline,
@@ -38,6 +50,12 @@ const extensions: Extensions = [
         : "Write something, or press '/' for commands...",
   }),
   SlashCommand,
+  // --- اضافه شد -----------------------------------------------------------
+  // این دو تا نیازی به config ندارن - رفتارشون کاملاً از طریق
+  // editor.commands.xxx() از بیرون کنترل میشه، نه از طریق تنظیمات اینجا.
+  SearchHighlightExtension,
+  SpotlightExtension,
+  // --------------------------------------------------------------------------
 ];
 
 interface EditorCanvasProps {
@@ -46,7 +64,6 @@ interface EditorCanvasProps {
   onSave: (noteId: string, content: JSONContent) => void;
 }
 
-// محتوای در حال ذخیره همیشه همراه با شناسه‌ی نوتی که بهش تعلق داره نگه داشته میشه
 interface PendingSave {
   noteId: string;
   content: JSONContent;
@@ -62,19 +79,14 @@ export default function EditorCanvas({
   );
   const debouncedContent = useDebounce(pendingContent, 300);
 
-  // برای تشخیص اینکه آیا تغییر noteId واقعاً سوییچ به نوت دیگه‌ست
   const activeNoteIdRef = useRef(noteId);
-
-  // آینه‌ی ref از pendingContent - چون توی افکت سوییچ نیاز داریم به
-  // *آخرین* مقدار به‌صورت synchronous دسترسی داشته باشیم، بدون اینکه
-  // منتظر دیباونس بمونیم یا pendingContent رو dependency افکت سوییچ کنیم
   const pendingContentRef = useRef<PendingSave | null>(null);
 
   const editor = useEditor({
     immediatelyRender: false,
     extensions,
     textDirection: "auto",
-    content: noteContent, // مقدار اولیه فقط در mount اول استفاده میشه
+    content: noteContent,
     onUpdate(props) {
       const json = props.editor.getJSON();
       const value: PendingSave = {
@@ -86,9 +98,8 @@ export default function EditorCanvas({
     },
   });
 
-  // سوییچ نوت: قبل از هر چیز، اگه ادیت ذخیره‌نشده‌ای از نوت قبلی مونده،
-  // همین الان (بدون صبر برای دیباونس) ذخیره‌ش کن - تا هیچ ادیتی گم نشه
-  // و هیچ‌وقت محتوای نوت قبلی با آیدی نوت جدید قاطی نشه.
+  // سوییچ نوت - این افکت باید همیشه قبل از هوک‌های سرچ زیر بمونه، چون
+  // اون‌ها فرض می‌کنن editor.state.doc همین الان محتوای نوتِ درست رو داره.
   useEffect(() => {
     if (!editor) return;
     if (activeNoteIdRef.current === noteId) return;
@@ -107,7 +118,6 @@ export default function EditorCanvas({
     editor.commands.setContent(noteContent, { emitUpdate: false });
   }, [noteId, noteContent, editor, onSave]);
 
-  // مسیر عادی: وقتی مقدار دیباونس‌شده (بعد از ۳۰۰ms سکون در تایپ) آماده شد
   useEffect(() => {
     if (debouncedContent === null) return;
     onSave(debouncedContent.noteId, debouncedContent.content);
@@ -115,11 +125,34 @@ export default function EditorCanvas({
     setPendingContent(null);
   }, [debouncedContent, onSave]);
 
+  // --- اضافه شد -----------------------------------------------------------
+  // عمداً بعد از افکت سوییچ نوت بالا صدا زده میشن - ترتیب فراخوانی هوک‌ها
+  // توی یه کامپوننت، ترتیب اجرای افکت‌هاشون رو هم مشخص می‌کنه. اگه این دو تا
+  // رو قبل از افکت سوییچ می‌ذاشتیم، ممکن بود موقع سوییچ تب، هنوز محتوای
+  // نوتِ قبلی توی editor.state.doc بود و موقعیت‌ها اشتباه محاسبه می‌شدن.
+  const inNoteSearch = useInNoteSearch({ noteId, editor });
+  useNoteSpotlight({ noteId, editor });
+  // --------------------------------------------------------------------------
+
   if (!editor) return null;
 
   return (
     <div className="editor-canvas prose prose-neutral dark:prose-invert">
       <SelectionToolbar editor={editor} />
+      {/* --- اضافه شد ----------------------------------------------------- */}
+      {inNoteSearch.isOpen &&
+        // <InNoteSearchToolbar
+        //   term={inNoteSearch.term}
+        //   matchCase={inNoteSearch.matchCase}
+        //   totalMatches={inNoteSearch.totalMatches}
+        //   activeMatchIndex={inNoteSearch.activeMatchIndex}
+        //   onSearch={inNoteSearch.search}
+        //   onNext={inNoteSearch.goToNext}
+        //   onPrevious={inNoteSearch.goToPrevious}
+        //   onClose={inNoteSearch.close}
+        // />
+        null}
+      {/* ------------------------------------------------------------------ */}
       <EditorContent editor={editor} />
     </div>
   );

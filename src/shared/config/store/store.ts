@@ -4,6 +4,8 @@ import explorerPreferences from "@/widgets/panel-explorer/model/explorer-prefere
 import explorer from "@/widgets/panel-explorer/model/explorer.slice";
 import tabs from "@/entities/tabs/model/slice";
 import appUI from "../../model/app-ui.store";
+import { noteSpotlightReducer } from "@/features/search/note-spotlight";
+import { inNoteSearchReducer } from "@/features/search/in-note-search";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +13,8 @@ export const store = configureStore({
     explorer,
     tabs,
     appUI,
+    noteSpotlightReducer,
+    inNoteSearchReducer,
   },
 });
 

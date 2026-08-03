@@ -1,5 +1,6 @@
 import type { NoteEntity } from "@/entities/note/model/types";
 import useRenameEntity from "@/features/entity/rename-entity/use-rename-entity";
+import { getSearchIndexManager } from "@/features/search/global-search/model/search-index-manager";
 import { Input } from "@/shared/ui/input";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -34,6 +35,7 @@ export default function NoteTitle({ note }: Props) {
       oldName: note?.name,
       parent_id: note?.parent_id,
     });
+    getSearchIndexManager().notifyNoteChanged({ id: note.id, title: trimmed });
   }, [draftTitle, note?.name, renameEntity]);
 
   const handleBlur = useCallback(() => {

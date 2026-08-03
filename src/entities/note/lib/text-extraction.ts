@@ -1,14 +1,10 @@
-
-
 const BLOCK_SEPARATOR = "\n";
-
 
 interface TiptapJSONNode {
   type?: string;
   text?: string;
   content?: TiptapJSONNode[];
 }
-
 
 export function extractPlainTextFromTiptapJSON(rawContent: unknown): string {
   const node = normalizeToJSONNode(rawContent);
@@ -42,12 +38,10 @@ function walkJSONNode(node: TiptapJSONNode, parts: string[]): void {
     }
   }
 
-
   if (node.content && node.type !== "text") {
     parts.push(BLOCK_SEPARATOR);
   }
 }
-
 
 export function findProseMirrorPositionForOffset(
   doc: {

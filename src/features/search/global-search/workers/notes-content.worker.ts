@@ -1,6 +1,6 @@
 import { db } from "@/app/indexed-db/db";
 import { createWorkerRpcServer } from "@/shared/lib/create-worker-rpc";
-import { extractPlainTextFromTiptapJSON } from "../lib/text-extraction";
+import { extractPlainTextFromTiptapJSON } from "@/entities/note/lib/text-extraction";
 import { buildPreview } from "../lib/build-preview";
 import type {
   NoteContentEntry,
