@@ -2,7 +2,10 @@ import { useAppSelector } from "@/shared/config/store/hooks";
 import NoteTitle from "./note-title";
 import TabControllerSection from "./tab-controller-section";
 import TabsSection from "./tabs-section";
-import { selectActiveNoteId } from "@/entities/tabs/model/selectors";
+import {
+  selectActiveNoteId,
+  selectActiveTabId,
+} from "@/entities/tabs/model/selectors";
 import NewTabScreen from "./new-tab-screen";
 import { useCallback, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +15,7 @@ import { useUpdateNote } from "@/entities/note/api/note.mutations";
 import type { JSONContent } from "@tiptap/react";
 import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
 import { getSearchIndexManager } from "@/features/search/global-search/model/search-index-manager";
+import { selectNoteSearchUi } from "@/features/search/in-note-search/model/in-note-search-slice";
 
 export default function EditorArea({
   children,
@@ -22,15 +26,18 @@ export default function EditorArea({
   ) => ReactNode;
 }) {
   const activeNoteId = useAppSelector(selectActiveNoteId);
+  const activeTabId = useAppSelector(selectActiveTabId);
   const { mutate } = useUpdateNote();
   const { data: note } = useQuery({
     ...notesQueryOptions,
     select: (data) => data.find((note) => note.id === activeNoteId),
   });
+  const { isOpen: isInNoteSearchOpen } = useAppSelector(
+    selectNoteSearchUi(note?.id || "", activeTabId),
+  );
 
   const handleSaveNoteContent = useCallback(
     (id: string, content: JSONContent) => {
-      console.log("save called on this id:", id);
       mutate({ id, data: { content } });
       getSearchIndexManager()
         .notifyNoteChanged({ id, content })
@@ -48,8 +55,10 @@ export default function EditorArea({
       </div>
       <div className="flex-1 flex flex-col min-h-0">
         <TabControllerSection noteTitle={note?.name} />
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="mx-auto w-full max-w-3xl py-3">
+        <ScrollArea className="flex-1 min-h-0 relative">
+          <div
+            className={`mx-auto w-full max-w-3xl py-3 ${isInNoteSearchOpen && "mt-8"}`}
+          >
             {note && <NoteTitle note={note} />}
             {note ? (
               <div className="flex-1">

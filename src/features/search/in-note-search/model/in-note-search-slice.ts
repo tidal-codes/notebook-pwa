@@ -7,8 +7,13 @@ export interface NoteSearchUiState {
   matchCase: boolean;
 }
 
+interface NoteSearchTarget {
+  noteId: string;
+  tabId: string;
+}
+
 interface InNoteSearchState {
-  byNoteId: Record<string, NoteSearchUiState>;
+  byKey: Record<string, NoteSearchUiState>;
 }
 
 const defaultNoteSearchUiState: NoteSearchUiState = {
@@ -18,25 +23,27 @@ const defaultNoteSearchUiState: NoteSearchUiState = {
 };
 
 const initialState: InNoteSearchState = {
-  byNoteId: {},
+  byKey: {},
 };
+
+function makeSearchKey(noteId: string, tabId: string): string {
+  return `${noteId}::${tabId}`;
+}
 
 const inNoteSearchSlice = createSlice({
   name: "inNoteSearch",
   initialState,
   reducers: {
-    /** User pressed e.g. Ctrl+F inside a note - opens an empty search bar. */
-    openSearch(state, action: PayloadAction<{ noteId: string }>) {
-      const entry = state.byNoteId[action.payload.noteId] ?? {
-        ...defaultNoteSearchUiState,
-      };
+    openSearch(state, action: PayloadAction<NoteSearchTarget>) {
+      const key = makeSearchKey(action.payload.noteId, action.payload.tabId);
+      const entry = state.byKey[key] ?? { ...defaultNoteSearchUiState };
       entry.isOpen = true;
-      state.byNoteId[action.payload.noteId] = entry;
+      state.byKey[key] = entry;
     },
 
-    /** User closed the in-note find bar (Escape / the ✕ button). */
-    closeSearch(state, action: PayloadAction<{ noteId: string }>) {
-      const entry = state.byNoteId[action.payload.noteId];
+    closeSearch(state, action: PayloadAction<NoteSearchTarget>) {
+      const key = makeSearchKey(action.payload.noteId, action.payload.tabId);
+      const entry = state.byKey[key];
       if (entry) {
         entry.isOpen = false;
         entry.term = "";
@@ -45,30 +52,28 @@ const inNoteSearchSlice = createSlice({
 
     setSearchTerm(
       state,
-      action: PayloadAction<{ noteId: string; term: string }>,
+      action: PayloadAction<NoteSearchTarget & { term: string }>,
     ) {
-      const entry = state.byNoteId[action.payload.noteId] ?? {
-        ...defaultNoteSearchUiState,
-      };
+      const key = makeSearchKey(action.payload.noteId, action.payload.tabId);
+      const entry = state.byKey[key] ?? { ...defaultNoteSearchUiState };
       entry.term = action.payload.term;
       entry.isOpen = true;
-      state.byNoteId[action.payload.noteId] = entry;
+      state.byKey[key] = entry;
     },
 
     setMatchCase(
       state,
-      action: PayloadAction<{ noteId: string; matchCase: boolean }>,
+      action: PayloadAction<NoteSearchTarget & { matchCase: boolean }>,
     ) {
-      const entry = state.byNoteId[action.payload.noteId] ?? {
-        ...defaultNoteSearchUiState,
-      };
+      const key = makeSearchKey(action.payload.noteId, action.payload.tabId);
+      const entry = state.byKey[key] ?? { ...defaultNoteSearchUiState };
       entry.matchCase = action.payload.matchCase;
-      state.byNoteId[action.payload.noteId] = entry;
+      state.byKey[key] = entry;
     },
 
-    /** Optional cleanup - call this when a tab actually closes, to avoid `byNoteId` growing forever. */
-    removeNoteSearchState(state, action: PayloadAction<{ noteId: string }>) {
-      delete state.byNoteId[action.payload.noteId];
+    removeNoteSearchState(state, action: PayloadAction<NoteSearchTarget>) {
+      const key = makeSearchKey(action.payload.noteId, action.payload.tabId);
+      delete state.byKey[key];
     },
   },
 });
@@ -84,6 +89,7 @@ export const {
 export default inNoteSearchSlice.reducer;
 
 export const selectNoteSearchUi =
-  (noteId: string) =>
+  (noteId: string, tabId: string) =>
   (state: RootState): NoteSearchUiState =>
-    state.inNoteSearchReducer.byNoteId[noteId] ?? defaultNoteSearchUiState;
+    state.inNoteSearchReducer.byKey[makeSearchKey(noteId, tabId)] ??
+    defaultNoteSearchUiState;

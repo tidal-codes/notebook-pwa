@@ -3,7 +3,6 @@ import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
-
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     searchHighlight: {
@@ -29,7 +28,7 @@ interface SearchHighlightState {
   term: string;
   matchCase: boolean;
   decorations: DecorationSet;
-  /** [from, to] ranges of every occurrence, in document order. */
+  /** [from, to] بازه‌ی هر مورد پیدا شده، به ترتیب داخل سند. */
   matchRanges: MatchRange[];
   activeMatchIndex: number;
 }
@@ -38,7 +37,7 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/** Walks the real ProseMirror doc and returns every occurrence's [from, to). */
+/** سند واقعی ProseMirror رو می‌گرده و بازه‌ی [from, to) هر occurrence رو برمی‌گردونه. */
 function computeMatches(
   doc: ProseMirrorNode,
   term: string,
@@ -69,7 +68,12 @@ function computeMatches(
   return matches;
 }
 
-/** Turns match ranges into an actual DecorationSet, marking the active one differently. */
+/**
+ * بازه‌های match رو تبدیل به DecorationSet واقعی می‌کنه.
+ * همه‌ی match ها کلاس "search-match" (هایلایت سکندری) می‌گیرن،
+ * فقط اونی که activeMatchIndex هست علاوه‌براون کلاس
+ * "search-match--active" (هایلایت اصلی) رو هم می‌گیره.
+ */
 function buildDecorationSet(
   doc: ProseMirrorNode,
   matches: MatchRange[],
@@ -89,22 +93,12 @@ function buildDecorationSet(
   return DecorationSet.create(doc, decorations);
 }
 
-function scrollToMatch(
-  view: { dispatch: (tr: any) => void; state: any },
-  match: MatchRange,
-) {
-  const tr = view.state.tr.setSelection(
-    view.state.selection.constructor.near(view.state.doc.resolve(match.from)),
-  );
-  view.dispatch(tr.scrollIntoView());
-}
-
 export const SearchHighlightExtension = Extension.create({
   name: "searchHighlight",
 
   addCommands() {
     return {
-      /** Sets (or replaces) the active search term and turns highlighting on. */
+      /** ترم سرچ رو ست (یا جایگزین) می‌کنه و هایلایت رو روشن می‌کنه. */
       setSearchTerm:
         (term: string, matchCase: boolean = false) =>
         ({ tr, dispatch }: any) => {
@@ -114,15 +108,18 @@ export const SearchHighlightExtension = Extension.create({
               term,
               matchCase,
             });
-            dispatch(tr);
           }
           return true;
         },
 
-      /** Moves the active match forward, wrapping around at the end. */
+      /**
+       * match فعال رو یکی جلو می‌بره (با چرخش به اول).
+       * توجه: هیچ اسکرولی اینجا انجام نمی‌شه - فقط meta ست می‌شه.
+       * اسکرول‌کردن مسئولیت لایه‌ی React (هوک) بعد از اجرای این کامنده.
+       */
       nextSearchMatch:
         () =>
-        ({ state, dispatch, view }: any) => {
+        ({ state, tr, dispatch }: any) => {
           const pluginState = searchHighlightPluginKey.getState(
             state,
           ) as SearchHighlightState;
@@ -133,21 +130,18 @@ export const SearchHighlightExtension = Extension.create({
             (pluginState.activeMatchIndex + 1) % pluginState.matchRanges.length;
 
           if (dispatch) {
-            const tr = state.tr.setMeta(searchHighlightPluginKey, {
+            tr.setMeta(searchHighlightPluginKey, {
               type: "setActiveIndex",
               index: nextIndex,
             });
-            dispatch(tr);
           }
-
-          scrollToMatch(view, pluginState.matchRanges[nextIndex]);
           return true;
         },
 
-      /** Moves the active match backward, wrapping around at the start. */
+      /** match فعال رو یکی عقب می‌بره (با چرخش به آخر). */
       previousSearchMatch:
         () =>
-        ({ state, dispatch, view }: any) => {
+        ({ state, tr, dispatch }: any) => {
           const pluginState = searchHighlightPluginKey.getState(
             state,
           ) as SearchHighlightState;
@@ -159,53 +153,50 @@ export const SearchHighlightExtension = Extension.create({
             (pluginState.activeMatchIndex - 1 + count) % count;
 
           if (dispatch) {
-            const tr = state.tr.setMeta(searchHighlightPluginKey, {
+            tr.setMeta(searchHighlightPluginKey, {
               type: "setActiveIndex",
               index: previousIndex,
             });
-            dispatch(tr);
           }
-
-          scrollToMatch(view, pluginState.matchRanges[previousIndex]);
           return true;
         },
 
       /**
-       * Used right after opening a note from the global search results:
-       * given the real ProseMirror position (converted from the plain-text
-       * offset via `findProseMirrorPositionForOffset`), select the match
-       * that contains it as "active" and scroll to it.
+       * بعد از باز کردن نوت از نتایج سرچ گلوبال صدا زده می‌شه: با گرفتن
+       * پوزیشن واقعی ProseMirror (تبدیل‌شده از offset متن ساده، از طریق
+       * findProseMirrorPositionForOffset)، matchـی که این پوزیشن داخلشه
+       * رو به‌عنوان "فعال" ست می‌کنه.
        */
       jumpToProseMirrorPosition:
         (proseMirrorPosition: number) =>
-        ({ state, dispatch, view }: any) => {
-          if (dispatch) {
-            const tr = state.tr.setMeta(searchHighlightPluginKey, {
-              type: "setActiveByPosition",
-              pos: proseMirrorPosition,
-            });
-            dispatch(tr);
-          }
-
+        ({ state, tr, dispatch }: any) => {
           const pluginState = searchHighlightPluginKey.getState(
             state,
           ) as SearchHighlightState;
-          const match = pluginState?.matchRanges.find(
+          if (!pluginState) return false;
+
+          const index = pluginState.matchRanges.findIndex(
             (range) =>
               proseMirrorPosition >= range.from &&
               proseMirrorPosition <= range.to,
           );
-          if (match) scrollToMatch(view, match);
+          if (index === -1) return false;
+
+          if (dispatch) {
+            tr.setMeta(searchHighlightPluginKey, {
+              type: "setActiveIndex",
+              index,
+            });
+          }
           return true;
         },
 
-      /** Turns off highlighting entirely (e.g. when the find toolbar is closed). */
+      /** هایلایت رو کاملاً خاموش می‌کنه (مثلاً وقتی نوار سرچ بسته می‌شه). */
       clearSearchHighlight:
         () =>
         ({ tr, dispatch }: any) => {
           if (dispatch) {
             tr.setMeta(searchHighlightPluginKey, { type: "clear" });
-            dispatch(tr);
           }
           return true;
         },
@@ -263,23 +254,6 @@ export const SearchHighlightExtension = Extension.create({
               };
             }
 
-            if (meta?.type === "setActiveByPosition") {
-              const index = previousState.matchRanges.findIndex(
-                (range) => meta.pos >= range.from && meta.pos <= range.to,
-              );
-              const activeMatchIndex =
-                index >= 0 ? index : previousState.activeMatchIndex;
-              return {
-                ...previousState,
-                activeMatchIndex,
-                decorations: buildDecorationSet(
-                  tr.doc,
-                  previousState.matchRanges,
-                  activeMatchIndex,
-                ),
-              };
-            }
-
             if (meta?.type === "clear") {
               return {
                 term: "",
@@ -290,18 +264,21 @@ export const SearchHighlightExtension = Extension.create({
               };
             }
 
-            // The document changed (user kept typing) but the search term
-            // is still active - re-scan so positions/highlights stay correct.
+            // سند تغییر کرده (کاربر داره تایپ می‌کنه) ولی ترم سرچ هنوز
+            // فعاله - دوباره اسکن کن تا پوزیشن‌ها/هایلایت‌ها درست بمونن.
             if (tr.docChanged && previousState.term) {
               const matchRanges = computeMatches(
                 tr.doc,
                 previousState.term,
                 previousState.matchCase,
               );
-              const activeMatchIndex = Math.min(
-                previousState.activeMatchIndex,
-                matchRanges.length - 1,
-              );
+              const activeMatchIndex =
+                matchRanges.length === 0
+                  ? -1
+                  : Math.min(
+                      previousState.activeMatchIndex,
+                      matchRanges.length - 1,
+                    );
               return {
                 ...previousState,
                 matchRanges,
@@ -314,8 +291,8 @@ export const SearchHighlightExtension = Extension.create({
               };
             }
 
-            // Nothing relevant changed - map the existing decorations
-            // through the transaction so they still line up positionally.
+            // چیز مرتبطی تغییر نکرده - فقط decoration های موجود رو
+            // با mapping تراکنش هماهنگ کن.
             return {
               ...previousState,
               decorations: previousState.decorations.map(tr.mapping, tr.doc),

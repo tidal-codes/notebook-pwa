@@ -28,6 +28,11 @@ import {
   SpotlightExtension,
   useNoteSpotlight,
 } from "@/features/search/note-spotlight";
+import { InNoteSearchToolbar } from "@/features/search/in-note-search/in-note-search-toolbar";
+import { useKeyboardShortcut } from "@/shared/lib/use-keyboard-shortcut";
+import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
+import { openSearch } from "@/features/search/in-note-search/model/in-note-search-slice";
+import { selectActiveTabId } from "@/entities/tabs/model/selectors";
 // --------------------------------------------------------------------------
 
 const extensions: Extensions = [
@@ -125,12 +130,8 @@ export default function EditorCanvas({
     setPendingContent(null);
   }, [debouncedContent, onSave]);
 
-  // --- اضافه شد -----------------------------------------------------------
-  // عمداً بعد از افکت سوییچ نوت بالا صدا زده میشن - ترتیب فراخوانی هوک‌ها
-  // توی یه کامپوننت، ترتیب اجرای افکت‌هاشون رو هم مشخص می‌کنه. اگه این دو تا
-  // رو قبل از افکت سوییچ می‌ذاشتیم، ممکن بود موقع سوییچ تب، هنوز محتوای
-  // نوتِ قبلی توی editor.state.doc بود و موقعیت‌ها اشتباه محاسبه می‌شدن.
-  const inNoteSearch = useInNoteSearch({ noteId, editor });
+  const tabId = useAppSelector(selectActiveTabId);
+  const inNoteSearch = useInNoteSearch({ noteId, editor, tabId });
   useNoteSpotlight({ noteId, editor });
   // --------------------------------------------------------------------------
 
@@ -140,18 +141,22 @@ export default function EditorCanvas({
     <div className="editor-canvas prose prose-neutral dark:prose-invert">
       <SelectionToolbar editor={editor} />
       {/* --- اضافه شد ----------------------------------------------------- */}
-      {inNoteSearch.isOpen &&
-        // <InNoteSearchToolbar
-        //   term={inNoteSearch.term}
-        //   matchCase={inNoteSearch.matchCase}
-        //   totalMatches={inNoteSearch.totalMatches}
-        //   activeMatchIndex={inNoteSearch.activeMatchIndex}
-        //   onSearch={inNoteSearch.search}
-        //   onNext={inNoteSearch.goToNext}
-        //   onPrevious={inNoteSearch.goToPrevious}
-        //   onClose={inNoteSearch.close}
-        // />
-        null}
+      {inNoteSearch.isOpen && (
+        <div className="absolute top-0 left-0 right-0 flex justify-center items-center pt-3 z-100 bg-background py-2">
+          <InNoteSearchToolbar
+            term={inNoteSearch.term}
+            matchCase={inNoteSearch.matchCase}
+            totalMatches={inNoteSearch.totalMatches}
+            activeMatchIndex={inNoteSearch.activeMatchIndex}
+            onSearch={inNoteSearch.search}
+            onNext={inNoteSearch.goToNext}
+            onPrevious={inNoteSearch.goToPrevious}
+            onClose={inNoteSearch.close}
+            noteId={noteId}
+            tabId={tabId}
+          />
+        </div>
+      )}
       {/* ------------------------------------------------------------------ */}
       <EditorContent editor={editor} />
     </div>

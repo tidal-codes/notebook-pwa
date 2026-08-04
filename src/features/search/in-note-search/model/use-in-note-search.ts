@@ -9,21 +9,39 @@ import {
   setMatchCase,
   setSearchTerm,
 } from "./in-note-search-slice";
+import { useKeyboardShortcut } from "@/shared/lib/use-keyboard-shortcut";
 
 interface UseInNoteSearchOptions {
   noteId: string;
+  tabId: string;
   editor: Editor | null;
 }
 
-export function useInNoteSearch({ noteId, editor }: UseInNoteSearchOptions) {
+function scrollToActiveMatch(editor: Editor) {
+  setTimeout(() => {
+    const activeEl = editor.view.dom.querySelector(".search-match--active");
+
+    if (activeEl) {
+      activeEl.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+    }
+  }, 50);
+}
+
+export function useInNoteSearch({
+  noteId,
+  tabId,
+  editor,
+}: UseInNoteSearchOptions) {
   const dispatch = useDispatch();
-  const ui = useSelector(selectNoteSearchUi(noteId));
+  const ui = useSelector(selectNoteSearchUi(noteId, tabId));
 
   const [totalMatches, setTotalMatches] = useState(0);
   const [activeMatchIndex, setActiveMatchIndex] = useState(-1);
 
-  // Derived counters - read straight from the ProseMirror plugin's own
-  // state after every transaction.
   useEffect(() => {
     if (!editor) return;
 
@@ -42,38 +60,52 @@ export function useInNoteSearch({ noteId, editor }: UseInNoteSearchOptions) {
     };
   }, [editor]);
 
-  // Push whatever term/matchCase Redux has for THIS note into the editor's
-  // extension - this is what actually makes the highlighting happen.
+  useKeyboardShortcut({
+    code: "KeyF",
+    ctrl: true,
+    callback: () => {
+      dispatch(openSearch({ noteId, tabId }));
+    },
+  });
+
   useEffect(() => {
     if (!editor) return;
     editor.commands.setSearchTerm(ui.term, ui.matchCase);
+
+    if (ui.term.trim()) {
+      scrollToActiveMatch(editor);
+    }
   }, [editor, ui.term, ui.matchCase]);
 
   const open = useCallback(
-    () => dispatch(openSearch({ noteId })),
-    [dispatch, noteId],
+    () => dispatch(openSearch({ noteId, tabId })),
+    [dispatch, noteId, tabId],
   );
 
   const search = useCallback(
     (term: string, matchCase: boolean) => {
-      dispatch(setSearchTerm({ noteId, term }));
-      dispatch(setMatchCase({ noteId, matchCase }));
+      dispatch(setSearchTerm({ noteId, tabId, term }));
+      dispatch(setMatchCase({ noteId, tabId, matchCase }));
     },
-    [dispatch, noteId],
+    [dispatch, noteId, tabId],
   );
 
   const goToNext = useCallback(() => {
-    editor?.commands.nextSearchMatch();
+    if (!editor) return;
+    editor.commands.nextSearchMatch();
+    scrollToActiveMatch(editor);
   }, [editor]);
 
   const goToPrevious = useCallback(() => {
-    editor?.commands.previousSearchMatch();
+    if (!editor) return;
+    editor.commands.previousSearchMatch();
+    scrollToActiveMatch(editor);
   }, [editor]);
 
   const close = useCallback(() => {
-    dispatch(closeSearch({ noteId }));
+    dispatch(closeSearch({ noteId, tabId }));
     editor?.commands.clearSearchHighlight();
-  }, [dispatch, noteId, editor]);
+  }, [dispatch, noteId, tabId, editor]);
 
   return {
     isOpen: ui.isOpen,
