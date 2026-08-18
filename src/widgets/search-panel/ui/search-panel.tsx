@@ -19,7 +19,6 @@ export default function SearchPanel() {
       handleOpenNote(noteId, "ACTIVE_TAB");
 
       if (source === "content") {
-        console.log(match)
         dispatch(
           requestSpotlight({
             noteId,

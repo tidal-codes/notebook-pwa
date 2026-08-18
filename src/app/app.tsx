@@ -12,7 +12,8 @@ export default function App() {
   useLayoutEffect(() => {
     console.log(document.querySelector(".loading-screen"))
     document.querySelector(".loading-screen")?.remove();
-  }, [])
+  }, []);
+
   return (
     <TooltipProvider delayDuration={900} skipDelayDuration={300}>
       <QueryClientProvider client={client}>
