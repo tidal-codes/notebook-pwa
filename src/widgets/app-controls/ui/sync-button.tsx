@@ -1,10 +1,17 @@
 import { Button } from "@/shared/ui/button";
 import Tooltip from "@/shared/ui/tooltip";
-import { RefreshCcw } from "lucide-react";
 import { useCanSync } from "../use-can-sync";
+import { useSyncStatus } from "@/features/sync/model/use-sync-status";
+import { getSyncManager } from "@/features/sync/model/create-sync-manager";
 
 export default function SyncButton() {
   const { canSync, message } = useCanSync();
+  const status = useSyncStatus();
+
+  async function handleSync() {
+    const res = await getSyncManager().syncNow();
+    console.log(res);
+  }
 
   return (
     <Tooltip side="left" content={canSync ? "Sync" : message}>
@@ -22,10 +29,12 @@ export default function SyncButton() {
           variant="ghost"
           size="icon-lg"
           className="text-muted-foreground"
-          disabled={!canSync}
+          disabled={!canSync || status === "syncing"}
           aria-label={canSync ? "Sync" : message}
+          onClick={handleSync}
         >
-          <RefreshCcw />
+          {/* <RefreshCcw /> */}
+          {status}
         </Button>
       </div>
     </Tooltip>

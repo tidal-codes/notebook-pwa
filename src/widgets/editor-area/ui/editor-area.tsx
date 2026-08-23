@@ -16,6 +16,7 @@ import type { JSONContent } from "@tiptap/react";
 import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
 import { getSearchIndexManager } from "@/features/search/global-search/model/search-index-manager";
 import { selectNoteSearchUi } from "@/features/search/in-note-search/model/in-note-search-slice";
+import { prepareEntityUpdate } from "@/shared/lib/prepare-entity";
 
 export default function EditorArea({
   children,
@@ -38,7 +39,8 @@ export default function EditorArea({
 
   const handleSaveNoteContent = useCallback(
     (id: string, content: JSONContent) => {
-      mutate({ id, data: { content } });
+      if (!note) return;
+      mutate({ id, data: prepareEntityUpdate(note, { content }) });
       getSearchIndexManager()
         .notifyNoteChanged({ id, content })
         .catch((error) =>

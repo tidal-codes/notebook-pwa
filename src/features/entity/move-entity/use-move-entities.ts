@@ -12,6 +12,7 @@ import { validateMoveTarget } from "./validate-move-target";
 import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
 import useGetNotesData from "@/entities/note/model/use-get-notes-data";
 import { getNextIndexedName } from "@/shared/lib/get-entity-name";
+import { prepareEntityUpdate } from "@/shared/lib/prepare-entity";
 
 class InvalidMoveError extends Error {
   public reason: "target-is-self" | "target-is-descendant";
@@ -68,8 +69,6 @@ export default function useMoveEntities() {
         return currentParentId !== folder_id;
       });
 
-      const updatedAt = Date.now();
-
       const usedFolderTitles = new Set(getSiblingTitles(allFolders, folder_id));
 
       const usedNoteTitles = new Set(getSiblingTitles(allNotes, folder_id));
@@ -80,35 +79,38 @@ export default function useMoveEntities() {
             .filter((entity) => entity.type === "folder")
             .map((entity) => {
               //TODO - HOW TO ADD FOLDER NAME
+              const folder = allFolders.find(
+                (folder) => folder.id === entity.id,
+              )!;
               const name = getNextIndexedName(
                 [...usedFolderTitles],
-                allFolders.find((folder) => folder.id === entity.id)?.name,
+                folder.name,
               );
               usedFolderTitles.add(name);
 
-              return updateFolder(entity.id, {
-                parent_id: folder_id,
-                name,
-                updated_at: updatedAt,
-                is_dirty: true,
-              });
+              return updateFolder(
+                entity.id,
+                prepareEntityUpdate(folder, {
+                  parent_id: folder_id,
+                  name,
+                }),
+              );
             }),
 
           ...entitiesToMove
             .filter((entity) => entity.type === "note")
             .map((entity) => {
-              const name = getNextIndexedName(
-                [...usedNoteTitles],
-                allNotes.find((note) => note.id === entity.id)?.name,
-              );
+              const note = allNotes.find((note) => note.id === entity.id)!;
+              const name = getNextIndexedName([...usedNoteTitles], note.name);
               usedNoteTitles.add(name);
 
-              return updateNote(entity.id, {
-                parent_id: folder_id,
-                name,
-                updated_at: updatedAt,
-                is_dirty: true,
-              });
+              return updateNote(
+                entity.id,
+                prepareEntityUpdate(note, {
+                  parent_id: folder_id,
+                  name,
+                }),
+              );
             }),
         ]);
       });

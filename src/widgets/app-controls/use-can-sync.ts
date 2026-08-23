@@ -5,7 +5,7 @@ interface CanSyncResult {
   canSync: boolean;
   message: string;
 }
-
+//TODO : MOVE IT SOMEWHERE ELSE TO FIX FSD DESIGN
 export function useCanSync(): CanSyncResult {
   const { status } = useAuth();
 
