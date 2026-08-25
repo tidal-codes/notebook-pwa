@@ -14,7 +14,7 @@ let instance: SyncManager | null = null;
  * Lazily creates (once) and returns the single app-wide SyncManager instance.
  * Import this - do NOT `new SyncManager()` anywhere else.
  */
-export function getSyncManager(): SyncManager {
+export function getSyncManager(onSuccessSync: () => void): SyncManager {
   if (!instance) {
     instance = new SyncManager({
       noteRepo: createSyncRepository(db.notes),
@@ -28,6 +28,7 @@ export function getSyncManager(): SyncManager {
       debounceMs: SYNC_CONFIG.debounceMs,
       heartbeatMs: SYNC_CONFIG.heartbeatMs,
       pushChunkSize: SYNC_CONFIG.pushChunkSize,
+      onSuccessSync
     });
   }
   return instance;

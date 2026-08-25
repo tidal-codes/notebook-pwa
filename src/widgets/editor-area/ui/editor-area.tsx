@@ -17,6 +17,8 @@ import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
 import { getSearchIndexManager } from "@/features/search/global-search/model/search-index-manager";
 import { selectNoteSearchUi } from "@/features/search/in-note-search/model/in-note-search-slice";
 import { prepareEntityUpdate } from "@/shared/lib/prepare-entity";
+import { getSyncManager } from "@/features/sync/model/create-sync-manager";
+import useRefetchAppData from "@/features/sync/model/use-refetch-app-data";
 
 export default function EditorArea({
   children,
@@ -28,6 +30,7 @@ export default function EditorArea({
 }) {
   const activeNoteId = useAppSelector(selectActiveNoteId);
   const activeTabId = useAppSelector(selectActiveTabId);
+  const { refetchAppData } = useRefetchAppData();
   const { mutate } = useUpdateNote();
   const { data: note } = useQuery({
     ...notesQueryOptions,
@@ -46,8 +49,9 @@ export default function EditorArea({
         .catch((error) =>
           console.error("Failed to update search index", error),
         );
+      getSyncManager(refetchAppData).notifyChange();
     },
-    [mutate],
+    [mutate, note],
   );
 
   return (

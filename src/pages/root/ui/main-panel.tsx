@@ -60,13 +60,7 @@ export default function MainPanel() {
         <PanelDrawer />
         <div className="w-full flex flex-1">
           <EditorArea>
-            {(note, onSave) => (
-              <EditorCanvas
-                noteId={note.id}
-                noteContent={note.content}
-                onSave={onSave}
-              />
-            )}
+            {(note, onSave) => <EditorCanvas note={note} onSave={onSave} />}
           </EditorArea>
         </div>
       </>
@@ -92,13 +86,7 @@ export default function MainPanel() {
       <ResizableHandle className="ring-primary data-[separator='hover']:ring-2 data-[separator='active']:ring-2" />
       <ResizablePanel id="editor_area">
         <EditorArea>
-          {(note, onSave) => (
-            <EditorCanvas
-              noteId={note.id}
-              noteContent={note.content}
-              onSave={onSave}
-            />
-          )}
+          {(note, onSave) => <EditorCanvas note={note} onSave={onSave} />}
         </EditorArea>
       </ResizablePanel>
     </ResizablePanelGroup>

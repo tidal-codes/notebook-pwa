@@ -45,6 +45,7 @@ export interface SyncApi {
 export function createSupabaseSyncApi(client: SupabaseClient): SyncApi {
   return {
     async push(payload: PushPayload): Promise<void> {
+      console.log("PUSH PAYLOAD", payload)
       const { error } = await client.rpc("sync_push_batch", {
         p_notes: payload.notes,
         p_folders: payload.folders,
@@ -57,7 +58,7 @@ export function createSupabaseSyncApi(client: SupabaseClient): SyncApi {
       if (error) throw new SyncApiError("pull-failed", error.message);
 
       const raw = data as InitialSnapshotResponse;
-      console.log("INITIAL DATA" , raw)
+      console.log("INITIAL DATA", raw)
 
       return {
         notes: (raw.notes as NoteServerRow[]).map((row) =>
@@ -77,6 +78,7 @@ export function createSupabaseSyncApi(client: SupabaseClient): SyncApi {
         p_cursor: cursor,
         p_limit: PULL_PAGE_SIZE,
       });
+      console.log("SYNC_PULL_CHANGES", data)
       if (error) throw new SyncApiError("pull-failed", error.message);
 
       const raw = data as {
@@ -94,7 +96,7 @@ export function createSupabaseSyncApi(client: SupabaseClient): SyncApi {
           needsResync: true,
         };
       }
-      
+
       const noteChanges: NoteEntity[] = [];
       const folderChanges: FolderEntity[] = [];
 
@@ -103,7 +105,7 @@ export function createSupabaseSyncApi(client: SupabaseClient): SyncApi {
       // letting the later one win on bulkPut is correct - no dedupe needed
       // for correctness, only as a minor future optimization.
       for (const change of raw.changes) {
-        if (change.entity_type === "note") {
+        if (change.entityType === "note") {
           noteChanges.push(
             fromNoteServerRow(change.payload as unknown as NoteServerRow),
           );
@@ -124,3 +126,4 @@ export function createSupabaseSyncApi(client: SupabaseClient): SyncApi {
     },
   };
 }
+

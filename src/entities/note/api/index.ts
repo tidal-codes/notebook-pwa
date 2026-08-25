@@ -8,6 +8,7 @@ export async function createNote(note: NoteEntity) {
 }
 
 export async function updateNote(id: string, data: Partial<NoteEntity>) {
+  console.log("UPDATE FIELDS" , data)
   await db.notes.update(id, data);
 }
 

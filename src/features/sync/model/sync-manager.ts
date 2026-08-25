@@ -49,6 +49,7 @@ export interface SyncManagerDeps {
   debounceMs: number;
   heartbeatMs: number;
   pushChunkSize: number;
+  onSuccessSync: () => void;
 }
 
 export class SyncManager {
@@ -124,6 +125,7 @@ export class SyncManager {
     try {
       const result = await this.withCrossTabLock(() => this.runCycle());
       this.setStatus("success");
+      this.deps.onSuccessSync();
       return { status: "success", result };
     } catch (error) {
       this.setStatus("error");
@@ -274,12 +276,12 @@ export class SyncManager {
 
     while (hasMore) {
       const page = await this.deps.api.pullChanges(cursor);
+      console.log("PAGE" , page)
 
       if (page.needsResync) {
         const result = await this.runInitialSync(pushedNotes, pushedFolders);
         return { ...result, pagesApplied: pagesApplied + result.pagesApplied };
       }
-
       const noteIds = page.noteChanges.map((n) => n.id);
       const folderIds = page.folderChanges.map((f) => f.id);
       const [localNotes, localFolders] = await Promise.all([
@@ -297,6 +299,8 @@ export class SyncManager {
         localFolders,
         foldersSnapshot,
       );
+      console.log("NOTES LOCAL" , localNotes);
+      console.log("FOLDER Result" , noteResult);
 
       await this.deps.applyChangeBatch({
         notesUpsert: noteResult.toUpsert,

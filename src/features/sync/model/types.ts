@@ -20,8 +20,8 @@ export type SyncOutcome =
 
 export interface RawLogChange {
   seq: number;
-  entity_type: EntityType;
-  entity_id: string;
+  entityType: EntityType;
+  entityId: string;
   payload: Record<string, unknown>;
 }
 
