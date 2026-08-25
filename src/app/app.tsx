@@ -6,6 +6,7 @@ import { useLayoutEffect, useMemo } from "react";
 import { ThemeProvider } from "./theme/theme-provider";
 import StoreProvider from "@/shared/config/store/store-provider";
 import { AuthProvider } from "@/features/auth/model/auth-provider";
+import { NetworkStatusProvider } from "@/shared/lib/network-status-provider";
 
 export default function App() {
   const client = useMemo(() => new QueryClient(), []);
@@ -19,9 +20,11 @@ export default function App() {
       <QueryClientProvider client={client}>
         <StoreProvider>
           <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
-            <AuthProvider>
-              <RouterProvider router={router} />
-            </AuthProvider>
+            <NetworkStatusProvider>
+              <AuthProvider>
+                <RouterProvider router={router} />
+              </AuthProvider>
+            </NetworkStatusProvider>
           </ThemeProvider>
         </StoreProvider>
       </QueryClientProvider>

@@ -71,7 +71,7 @@ export default function EditorArea({
                 {children(note, handleSaveNoteContent)}
               </div>
             ) : (
-              <NewTabScreen />
+              <NewTabScreen activeTabId={activeTabId}/>
             )}
           </div>
           <ScrollBar orientation="vertical" />

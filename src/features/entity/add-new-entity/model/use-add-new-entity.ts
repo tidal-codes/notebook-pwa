@@ -5,11 +5,15 @@ import { useCreateNote } from "@/entities/note/api/note.mutations";
 import type { BaseEntity, TreeEntity } from "@/shared/model/types";
 import useGetNotesData from "@/entities/note/model/use-get-notes-data";
 import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
-import { getNextUntitledName } from "@/shared/lib/get-entity-name";
+import { getNextUntitledName, isTitleUnique } from "@/shared/lib/get-entity-name";
 import type { JSONContent } from "@tiptap/core";
 import type { SyncableFields } from "@/shared/model/syncable.types";
 
 type OnEntityCreated = (type: TreeEntity, id: string) => void;
+
+type CreateItemResult =
+  | { success: true; details: string }
+  | { success: false; details: string };
 
 export default function useAddNewEntity() {
   const queryClient = useQueryClient();
@@ -32,7 +36,8 @@ export default function useAddNewEntity() {
       type: TreeEntity,
       parentFolderId: string | null,
       onEntityCreated: OnEntityCreated,
-    ) => {
+      name?: string,
+    ): CreateItemResult => {
       const notes = getNotesData();
       const folders = getFoldersData();
 
@@ -40,14 +45,24 @@ export default function useAddNewEntity() {
         .filter((item) => item.parent_id === parentFolderId)
         .map((item) => item.name);
 
-      const name = getNextUntitledName(siblingNames);
+      let finalName: string;
+
+      if (name !== undefined) {
+        const unique = isTitleUnique(siblingNames, name);
+        if (!unique) {
+          return { success: false, details: "isTitleUnique false" };
+        }
+        finalName = name;
+      } else {
+        finalName = getNextUntitledName(siblingNames);
+      }
 
       const id = crypto.randomUUID();
       const now = Date.now();
 
       const baseItem: BaseEntity & SyncableFields = {
         id,
-        name,
+        name: finalName,
         is_dirty: 1,
         is_deleted: 0,
         version: 1,
@@ -68,8 +83,10 @@ export default function useAddNewEntity() {
       }
 
       onEntityCreated(type, id);
+
+      return { success: true, details: "created successfully" };
     },
-    [queryClient, addNote, addFolder],
+    [queryClient, addNote, addFolder, getNotesData, getFoldersData],
   );
 
   return { createItem };

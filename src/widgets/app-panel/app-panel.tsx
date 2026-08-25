@@ -43,8 +43,12 @@ export default function AppPanel({ isDrawer = false }: Props) {
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => navigate(item.href)}
-                className="text-muted-foreground"
+                onClick={() => item.title !== panel && navigate(item.href)}
+                className={
+                  item.title === panel
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                }
               >
                 <item.icon />
               </Button>

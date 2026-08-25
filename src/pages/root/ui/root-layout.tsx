@@ -7,6 +7,8 @@ import AppControll from "./app-controll";
 import MainPanel from "./main-panel";
 import AuthDialog from "@/features/auth/ui/auth-dialog";
 import { useAutoSync } from "@/features/sync/model/use-auto-sync";
+import GoToDialog from "@/widgets/editor-area/ui/go-to-dialog";
+import { GoToDialogProvider } from "@/widgets/editor-area/ui/go-to-dialog-provider";
 
 export default function RootLayout() {
   useAutoSync();
@@ -14,14 +16,17 @@ export default function RootLayout() {
   return (
       <ConfirmDeleteDialogProvider>
         <MoveEntityDialogProvider>
-          <Toaster position="top-center" />
-          <ConfirmDeleteDialog />
-          <MoveEntityDialog />
-          <AuthDialog />
-          <div className="h-screen flex flex-col md:flex-row items-center">
-            <AppControll />
-            <MainPanel />
-          </div>
+          <GoToDialogProvider>
+            <Toaster position="top-center" />
+            <ConfirmDeleteDialog />
+            <MoveEntityDialog />
+            <AuthDialog />
+            <GoToDialog />
+            <div className="h-screen flex flex-col md:flex-row items-center">
+              <AppControll />
+              <MainPanel />
+            </div>
+          </GoToDialogProvider>
         </MoveEntityDialogProvider>
       </ConfirmDeleteDialogProvider>
   );

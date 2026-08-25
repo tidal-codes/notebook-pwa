@@ -6,12 +6,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { LogOut, User } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { useSignOut } from "@/features/auth/api/auth.mutations";
-import { useNetworkStatus } from "@/shared/lib/use-network-status";
+import { useNetworkStatusContext } from "@/shared/lib/network-status-provider";
+
 
 export default function UserAvatarMenu() {
   const { handleOpen } = useAuthDialog();
   const { status, session } = useAuth();
-  const { isOnline } = useNetworkStatus({});
+  const { isOnline } = useNetworkStatusContext();
   const { mutateAsync, isPending } = useSignOut(() => isOnline);
 
   if (status === "initializing") {

@@ -5,7 +5,8 @@ import { Input } from "@/shared/ui/input";
 import useSignupForm from "../model/use-signup-form";
 import type { SignUpSchema } from "../model/schemas";
 import { useSignUp } from "../api/auth.mutations";
-import { useNetworkStatus } from "@/shared/lib/use-network-status";
+import { useNetworkStatusContext } from "@/shared/lib/network-status-provider";
+
 
 interface Props {
   handleCloseDialog: () => void;
@@ -19,7 +20,7 @@ export default function SignupForm({ handleCloseDialog }: Props) {
     formState: { errors, isSubmitting },
   } = useSignupForm();
 
-  const { isOnline } = useNetworkStatus({});
+  const { isOnline } = useNetworkStatusContext();
 
   const { mutateAsync: signUp, isPending } = useSignUp(() => isOnline);
 

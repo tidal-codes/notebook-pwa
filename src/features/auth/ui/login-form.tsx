@@ -4,7 +4,8 @@ import { Input } from "@/shared/ui/input";
 import { Field, FieldContent, FieldError, FieldLabel } from "@/shared/ui/field";
 import type { LoginSchema } from "../model/schemas";
 import { useSignIn } from "../api/auth.mutations";
-import { useNetworkStatus } from "@/shared/lib/use-network-status";
+import { useNetworkStatusContext } from "@/shared/lib/network-status-provider";
+
 
 interface Props {
   handleCloseDialog: () => void;
@@ -18,7 +19,7 @@ export default function LoginForm({ handleCloseDialog }: Props) {
     formState: { errors, isSubmitting },
   } = useLoginForm();
 
-  const { isOnline } = useNetworkStatus({});
+  const { isOnline } = useNetworkStatusContext();
 
   const { mutateAsync: signIn, isPending } = useSignIn(() => isOnline);
 
