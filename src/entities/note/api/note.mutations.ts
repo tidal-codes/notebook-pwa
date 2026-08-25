@@ -28,9 +28,9 @@ export function useDeleteNote() {
   return useOptimisticMutation({
     mutationKey: ["delete_note"],
     queryKey: NOTES_KEY,
-    mutationFn: (id: string) => deleteNote(id),
+    mutationFn: (note: NoteEntity) => deleteNote(note.id, note),
     optimisticUpdater(variables, oldData: NoteEntity[]) {
-      return oldData.filter((note) => note.id !== variables);
+      return oldData.filter((note) => note.id !== variables.id);
     },
   });
 }

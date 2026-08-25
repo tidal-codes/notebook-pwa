@@ -5,12 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLayoutEffect, useMemo } from "react";
 import { ThemeProvider } from "./theme/theme-provider";
 import StoreProvider from "@/shared/config/store/store-provider";
-
+import { AuthProvider } from "@/features/auth/model/auth-provider";
 
 export default function App() {
   const client = useMemo(() => new QueryClient(), []);
   useLayoutEffect(() => {
-    console.log(document.querySelector(".loading-screen"))
+    console.log(document.querySelector(".loading-screen"));
     document.querySelector(".loading-screen")?.remove();
   }, []);
 
@@ -19,7 +19,9 @@ export default function App() {
       <QueryClientProvider client={client}>
         <StoreProvider>
           <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
-            <RouterProvider router={router} />
+            <AuthProvider>
+              <RouterProvider router={router} />
+            </AuthProvider>
           </ThemeProvider>
         </StoreProvider>
       </QueryClientProvider>

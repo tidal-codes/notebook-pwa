@@ -10,7 +10,7 @@ interface Props {
 
 export default function NoteTitle({ note }: Props) {
   const [draftTitle, setDraftTitle] = useState(note?.name ?? "");
-  const { renameEntity } = useRenameEntity(note.id, "note");
+  const { renameEntity } = useRenameEntity(note);
 
   const isFinalizedRef = useRef(false);
 
@@ -33,7 +33,6 @@ export default function NoteTitle({ note }: Props) {
     renameEntity({
       newName: trimmed,
       oldName: note?.name,
-      parent_id: note?.parent_id,
     });
     getSearchIndexManager().notifyNoteChanged({ id: note.id, title: trimmed });
   }, [draftTitle, note?.name, renameEntity]);

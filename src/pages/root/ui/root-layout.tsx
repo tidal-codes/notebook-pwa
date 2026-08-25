@@ -6,11 +6,12 @@ import { MoveEntityDialogProvider } from "@/features/entity/move-entity/move-ent
 import AppControll from "./app-controll";
 import MainPanel from "./main-panel";
 import AuthDialog from "@/features/auth/ui/auth-dialog";
-import { AuthProvider } from "@/features/auth/model/auth-provider";
+import { useAutoSync } from "@/features/sync/model/use-auto-sync";
 
 export default function RootLayout() {
+  useAutoSync();
+
   return (
-    <AuthProvider>
       <ConfirmDeleteDialogProvider>
         <MoveEntityDialogProvider>
           <Toaster position="top-center" />
@@ -23,6 +24,5 @@ export default function RootLayout() {
           </div>
         </MoveEntityDialogProvider>
       </ConfirmDeleteDialogProvider>
-    </AuthProvider>
   );
 }

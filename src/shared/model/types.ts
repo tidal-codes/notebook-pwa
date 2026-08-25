@@ -2,18 +2,12 @@ export interface BaseEntity {
   id: string;
   name: string;
   parent_id: string | null;
-  created_at: string | number;
-  updated_at: string | number;
-  is_deleted: boolean;
-  is_dirty: boolean;
 }
 
 export interface SelectedEntity {
   id: string;
   type: TreeEntity;
 }
-
-
 
 // ------- MENU ---------
 import type { ReactNode } from "react";
@@ -104,3 +98,4 @@ export interface MenuCallbacks<TId extends string = string> {
 // ----------------------
 
 export type TreeEntity = "folder" | "note";
+export type EntityType = TreeEntity;

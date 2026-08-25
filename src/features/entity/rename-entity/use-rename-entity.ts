@@ -1,21 +1,27 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 import { useUpdateFolder } from "@/entities/folder/api/folder.mutations";
 import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
 import type { FolderEntity } from "@/entities/folder/model/types";
+
 import { useUpdateNote } from "@/entities/note/api/note.mutations";
-import { NOTES_KEY } from "@/entities/note/api/query.keys";
+
 import type { NoteEntity } from "@/entities/note/model/types";
-import type { TreeEntity } from "@/shared/model/types";
+
+
 import { isTitleUnique } from "@/shared/lib/get-entity-name";
+import { prepareEntityUpdate } from "@/shared/lib/prepare-entity";
+import { NOTES_KEY } from "@/entities/note/api/query.keys";
 
 interface RenameEntityParams {
   newName: string;
   oldName: string;
-  parent_id: string | null;
 }
 
-export default function useRenameEntity(id: string, type: TreeEntity) {
+type RenameableEntity = NoteEntity | FolderEntity;
+
+export default function useRenameEntity(entity: RenameableEntity) {
   const queryClient = useQueryClient();
 
   const { mutate: updateNote } = useUpdateNote(
@@ -28,7 +34,7 @@ export default function useRenameEntity(id: string, type: TreeEntity) {
     () => toast.success("Folder renamed successfully"),
   );
 
-  function renameEntity({ newName, oldName, parent_id }: RenameEntityParams) {
+  function renameEntity({ newName, oldName }: RenameEntityParams) {
     const trimmedName = newName.trim();
 
     if (trimmedName === "") {
@@ -40,23 +46,49 @@ export default function useRenameEntity(id: string, type: TreeEntity) {
       return;
     }
 
-    const notes = queryClient.getQueryData<NoteEntity[]>(NOTES_KEY) ?? [];
+    const parentId = entity.parent_id;
+
+    if (entity.type === "note") {
+      const notes = queryClient.getQueryData<NoteEntity[]>(NOTES_KEY) ?? [];
+
+      const siblingNames = notes
+        .filter((note) => note.parent_id === parentId && note.id !== entity.id)
+        .map((note) => note.name);
+
+      if (!isTitleUnique(siblingNames, trimmedName)) {
+        toast.error("An item with this name already exists");
+        return;
+      }
+
+      updateNote({
+        id: entity.id,
+        data: prepareEntityUpdate(entity, {
+          name: trimmedName,
+        }),
+      });
+
+      return;
+    }
+
     const folders = queryClient.getQueryData<FolderEntity[]>(FOLDERS_KEY) ?? [];
 
-    const siblingNames = (type === "note" ? notes : folders)
-      .filter((item) => item.parent_id === parent_id && item.id !== id)
-      .map((item) => item.name);
+    const siblingNames = folders
+      .filter(
+        (folder) => folder.parent_id === parentId && folder.id !== entity.id,
+      )
+      .map((folder) => folder.name);
 
     if (!isTitleUnique(siblingNames, trimmedName)) {
       toast.error("An item with this name already exists");
       return;
     }
 
-    if (type === "note") {
-      updateNote({ id, data: { name: trimmedName } });
-    } else {
-      updateFolder({ id, data: { name: trimmedName } });
-    }
+    updateFolder({
+      id: entity.id,
+      data: prepareEntityUpdate(entity, {
+        name: trimmedName,
+      }),
+    });
   }
 
   return { renameEntity };

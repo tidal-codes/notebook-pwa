@@ -6,8 +6,10 @@ import { resolveDeletionSet, type TreeEntityRef } from "./resolve-deletion-set";
 import { updateFolder } from "@/entities/folder/api";
 import { updateNote } from "@/entities/note/api";
 import type { SelectedEntity } from "@/shared/model/types";
-import useGetFoldersData from "@/entities/note/model/use-get-notes-data";
+import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
 import useGetNotesData from "@/entities/note/model/use-get-notes-data";
+import { prepareEntityDelete } from "@/shared/lib/prepare-entity";
+import { getSearchIndexManager } from "@/features/search/global-search/model/search-index-manager";
 
 export default function useDeleteEntities() {
   const queryClient = useQueryClient();
@@ -17,8 +19,6 @@ export default function useDeleteEntities() {
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ["delete-entities"],
     mutationFn: async (selectedItems: SelectedEntity[]) => {
-      // اینجا چون داخل mutationFn هستیم و نه useEffect، خوندن مستقیم از کش
-      // مشکلی نداره — دیتا در لحظه‌ی اجرای mutation (نه در closure رندر) خونده می‌شه
       const folders = getFoldersData();
       const notes = getNotesData();
 
@@ -39,24 +39,18 @@ export default function useDeleteEntities() {
         selectedItems,
         allEntities,
       );
-      const updatedAt = Date.now();
 
       await db.transaction("rw", db.notes, db.folders, async () => {
         await Promise.all([
-          ...folderIds.map((id) =>
-            updateFolder(id, {
-              is_deleted: true,
-              updated_at: updatedAt,
-              is_dirty: true,
-            }),
-          ),
-          ...noteIds.map((id) =>
-            updateNote(id, {
-              is_deleted: true,
-              updated_at: updatedAt,
-              is_dirty: true,
-            }),
-          ),
+          ...folderIds.map((id) => {
+            const folder = folders.find((folder) => folder.id === id)!;
+            return updateFolder(id, prepareEntityDelete(folder));
+          }),
+          ...noteIds.map((id) => {
+            const note = notes.find((note) => note.id === id)!;
+            getSearchIndexManager().notifyNoteDeleted(id);
+            return updateNote(id, prepareEntityDelete(note));
+          }),
         ]);
       });
 

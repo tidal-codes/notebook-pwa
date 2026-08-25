@@ -5,8 +5,6 @@ import { useCreateNote } from "@/entities/note/api/note.mutations";
 import type { NoteEntity } from "@/entities/note/model/types";
 import type { FolderEntity } from "@/entities/folder/model/types";
 import type { TreeEntity } from "@/shared/model/types";
-import { NOTES_KEY } from "@/entities/note/api/query.keys";
-import { FOLDERS_KEY } from "@/entities/folder/api/query.key";
 import { getNextUntitledName } from "@/shared/lib/get-next-untitled-name";
 import useGetFoldersData from "@/entities/folder/model/use-get-folders-data";
 import useGetNotesData from "@/entities/note/model/use-get-notes-data";
@@ -30,8 +28,8 @@ export default function useCloneEntity() {
         name: getNextUntitledName(siblingNames, note.name),
         created_at: now,
         updated_at: now,
-        is_dirty: true,
-        is_deleted: false,
+        is_dirty: 1,
+        is_deleted: 0,
       };
       addNote(cloned);
       return cloned;
@@ -56,8 +54,8 @@ export default function useCloneEntity() {
         name: getNextUntitledName(siblingFolderNames, folder.name),
         created_at: now,
         updated_at: now,
-        is_dirty: true,
-        is_deleted: false,
+        is_dirty: 1,
+        is_deleted: 0,
       };
       addFolder(clonedRoot);
 
@@ -95,8 +93,8 @@ export default function useCloneEntity() {
               parent_id: newParentId,
               created_at: now,
               updated_at: now,
-              is_dirty: true,
-              is_deleted: false,
+              is_dirty: 1,
+              is_deleted: 0,
             });
             queue.push(child.id);
           } else {
@@ -106,8 +104,8 @@ export default function useCloneEntity() {
               parent_id: newParentId,
               created_at: now,
               updated_at: now,
-              is_dirty: true,
-              is_deleted: false,
+              is_dirty: 1,
+              is_deleted: 0,
             });
           }
         }

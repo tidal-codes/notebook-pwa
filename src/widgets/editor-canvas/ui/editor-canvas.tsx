@@ -29,9 +29,7 @@ import {
   useNoteSpotlight,
 } from "@/features/search/note-spotlight";
 import { InNoteSearchToolbar } from "@/features/search/in-note-search/in-note-search-toolbar";
-import { useKeyboardShortcut } from "@/shared/lib/use-keyboard-shortcut";
-import { useAppDispatch, useAppSelector } from "@/shared/config/store/hooks";
-import { openSearch } from "@/features/search/in-note-search/model/in-note-search-slice";
+import { useAppSelector } from "@/shared/config/store/hooks";
 import { selectActiveTabId } from "@/entities/tabs/model/selectors";
 // --------------------------------------------------------------------------
 
@@ -64,8 +62,7 @@ const extensions: Extensions = [
 ];
 
 interface EditorCanvasProps {
-  noteId: string;
-  noteContent: JSONContent;
+  note: NoteEntity;
   onSave: (noteId: string, content: JSONContent) => void;
 }
 
@@ -74,18 +71,26 @@ interface PendingSave {
   content: JSONContent;
 }
 
-export default function EditorCanvas({
-  noteId,
-  noteContent,
-  onSave,
-}: EditorCanvasProps) {
+interface ActiveNoteRef {
+  id: string;
+  version: number;
+}
+
+export default function EditorCanvas({ note, onSave }: EditorCanvasProps) {
+  const { id: noteId, content: noteContent, version: noteVersion } = note;
+
   const [pendingContent, setPendingContent] = useState<PendingSave | null>(
     null,
   );
   const debouncedContent = useDebounce(pendingContent, 300);
 
-  const activeNoteIdRef = useRef(noteId);
+  const activeNoteRef = useRef<ActiveNoteRef>({
+    id: noteId,
+    version: noteVersion,
+  });
   const pendingContentRef = useRef<PendingSave | null>(null);
+  // آخرین محتوایی که خودمون از طریق onSave فرستادیم - برای تشخیص echo
+  const lastSavedContentRef = useRef<JSONContent | null>(null);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -95,7 +100,7 @@ export default function EditorCanvas({
     onUpdate(props) {
       const json = props.editor.getJSON();
       const value: PendingSave = {
-        noteId: activeNoteIdRef.current,
+        noteId: activeNoteRef.current.id,
         content: json,
       };
       pendingContentRef.current = value;
@@ -103,44 +108,58 @@ export default function EditorCanvas({
     },
   });
 
-  // سوییچ نوت - این افکت باید همیشه قبل از هوک‌های سرچ زیر بمونه، چون
-  // اون‌ها فرض می‌کنن editor.state.doc همین الان محتوای نوتِ درست رو داره.
+  // سوییچ نوت یا آپدیت ورژن همون نوت (تغییر از بیرون) - این افکت باید
+  // همیشه قبل از هوک‌های سرچ زیر بمونه، چون اون‌ها فرض می‌کنن
+  // editor.state.doc همین الان محتوای نوتِ درست رو داره.
   useEffect(() => {
     if (!editor) return;
-    if (activeNoteIdRef.current === noteId) return;
 
-    if (pendingContentRef.current !== null) {
+    const isSameNote = activeNoteRef.current.id === noteId;
+    const isSameVersion = activeNoteRef.current.version === noteVersion;
+
+    if (isSameNote && isSameVersion) return;
+
+    if (!isSameNote && pendingContentRef.current !== null) {
       onSave(
         pendingContentRef.current.noteId,
         pendingContentRef.current.content,
       );
     }
 
-    activeNoteIdRef.current = noteId;
+    const isOwnEcho =
+      isSameNote &&
+      lastSavedContentRef.current !== null &&
+      JSON.stringify(lastSavedContentRef.current) ===
+        JSON.stringify(noteContent);
+
+    activeNoteRef.current = { id: noteId, version: noteVersion };
+
+    if (isOwnEcho) {
+      return;
+    }
+
     pendingContentRef.current = null;
     setPendingContent(null);
-
     editor.commands.setContent(noteContent, { emitUpdate: false });
-  }, [noteId, noteContent, editor, onSave]);
+  }, [noteId, noteVersion, noteContent, editor, onSave]);
 
   useEffect(() => {
     if (debouncedContent === null) return;
+    lastSavedContentRef.current = debouncedContent.content;
     onSave(debouncedContent.noteId, debouncedContent.content);
     pendingContentRef.current = null;
     setPendingContent(null);
-  }, [debouncedContent, onSave]);
+  }, [debouncedContent]);
 
   const tabId = useAppSelector(selectActiveTabId);
   const inNoteSearch = useInNoteSearch({ noteId, editor, tabId });
   useNoteSpotlight({ noteId, editor });
-  // --------------------------------------------------------------------------
 
   if (!editor) return null;
 
   return (
     <div className="editor-canvas prose prose-neutral dark:prose-invert">
       <SelectionToolbar editor={editor} />
-      {/* --- اضافه شد ----------------------------------------------------- */}
       {inNoteSearch.isOpen && (
         <div className="absolute top-0 left-0 right-0 flex justify-center items-center pt-3 z-100 bg-background py-2">
           <InNoteSearchToolbar
@@ -157,7 +176,6 @@ export default function EditorCanvas({
           />
         </div>
       )}
-      {/* ------------------------------------------------------------------ */}
       <EditorContent editor={editor} />
     </div>
   );
